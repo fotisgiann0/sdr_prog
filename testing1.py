@@ -296,4 +296,3 @@ print("edw eibai o B0", B00)
 print("A0 matrix", A0)
 print("try pull")
 
-print("23")
