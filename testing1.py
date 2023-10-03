@@ -292,7 +292,5 @@ B00 = np.block(
     final_array
 )
 print("edw eibai o B0", B00)
-
+#check A0
 print("A0 matrix", A0)
-
-print("checking")
