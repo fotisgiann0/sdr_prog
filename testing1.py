@@ -270,6 +270,7 @@ B00 =[]
 first_row = []
 second_row = []
 final_array = []
+#b0t einai o adj tou b0
 b0t = np.empty((1, q+2), float)
 for i in range(q+2):
     b0t[0][i] = b0[i][0]
