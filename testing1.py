@@ -280,7 +280,6 @@ for i in range(q+2):
 first_row.append(A0)
 print("edw first row " ,first_row)
 first_row.append(0.5*b0)
-print("edw first row " ,first_row)
 final_array.append(first_row)
 print("edw final arr", final_array)
 second_row.append(0.5*b0t)
