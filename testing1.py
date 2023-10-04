@@ -140,7 +140,7 @@ A4 = np.block(
 )
 print(A4)
 
-
+#k4 einai o adj tou b4
 b41 = []
 k4 = []
 b41.append(np.zeros([1,q]))
