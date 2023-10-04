@@ -6,6 +6,7 @@ n = 5
 q = m*n + n + 1
 q2 = m*n + n + 2
 q3 = m*n + n
+q4 = m*n + n + 3
 p = n*m+n
 ptx = 85
 prx = 99
@@ -294,4 +295,54 @@ B00 = np.block(
 print("edw eibai o B0", B00)
 
 
+#b2 einai o b2, g5 einai o adj tou b2
+B20 = []
+first_row = []
+second_row = []
+final_array = []
+#print("first, sec,...", first_row, second_row, final_array)
 
+first_row.append(A2)
+first_row.append(0.5*b2)
+final_array.append(first_row)
+second_row.append(0.5*g5)
+second_row.append(0)
+final_array.append(second_row)
+B20 = np.block(
+    final_array
+)
+print("edw einai o B2", B20)
+
+#k4 einai o adj tou b4
+B40 = []
+first_row = []
+second_row = []
+final_array = []
+
+first_row.append(A4)
+first_row.append(0.5*b4)
+final_array.append(first_row)
+second_row.append(0.5*k4)
+second_row.append(0)
+final_array.append(second_row)
+B40 = np.block(
+    final_array
+)
+print("edw einai o B4", B40)
+
+#k5 einai o adj tou b5
+B50 = []
+first_row = []
+second_row = []
+final_array = []
+
+first_row.append(np.zeros([q4,q4]))
+first_row.append(0.5*b5)
+final_array.append(first_row)
+second_row.append(0.5*k5)
+second_row.append(0)
+final_array.append(second_row)
+B50 = np.block(
+    final_array
+)
+print("edw einai o B5", B50)
