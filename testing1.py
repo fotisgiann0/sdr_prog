@@ -8,6 +8,8 @@ q2 = m*n + n + 2
 q3 = m*n + n
 q4 = m*n + n + 3
 p = m + n #dokimastiki timi
+h = m -1  #dokimastiki timi
+jj_row = 2 #dokimastiki timi
 ptx = 85
 prx = 99
 le = 7
@@ -111,7 +113,7 @@ print(A2)
 
 
 a31 = []
-for i in range(m):
+for i in range(m + 1):
     a31.append(np.identity(n))
 a31.append(np.zeros([n,3]))
 A3 = np.block(
@@ -346,3 +348,69 @@ B50 = np.block(
     final_array
 )
 print("edw einai o B5", B50)
+
+#Gp 
+Gp = []
+first_row = []
+second_row = []
+final_array = []
+
+up_adj = np.zeros([1, n*m + n + 3])
+up_adj[0][p-1] = 1
+first_row.append(diag_up(p))
+first_row.append(-0.5*create_up(p))
+final_array.append(first_row)
+second_row.append(-0.5*up_adj)
+second_row.append(0)
+final_array.append(second_row)
+Gp = np.block(
+    final_array
+)
+print("edw einai o Gp", Gp)
+
+#Hh
+Hh = []
+first_row = []
+second_row = []
+final_array = []
+hh1 = np.zeros([n+ m*n + 3 ,1])  #grammi h tou A1 kai adj tis grammis
+hh2 = np.zeros([1,n+ m*n + 3])
+for i in range(n+ m*n + 3):
+    hh1[i][0] = A1[h-1][i]
+    hh2[0][i] = A1[h-1][i]
+
+
+first_row.append(np.zeros([q4,q4]))
+first_row.append(0.5*hh1)
+final_array.append(first_row)
+second_row.append(0.5*hh2)
+second_row.append(0)
+final_array.append(second_row)
+Hh = np.block(
+    final_array
+)
+print("edw einai o Hh", Hh)
+
+#Jj
+Jj = []
+first_row = []
+
+second_row = []
+final_array = []
+jj1 = np.zeros([m*n + 3 + n,1])  #grammi jj_row tou A3 kai adj tis grammis
+jj2 = np.zeros([1,m*n + n + 3])
+for i in range(m*n + 3 + n):
+    jj1[i][0] = A3[jj_row-1][i]
+    jj2[0][i] = A3[jj_row-1][i]
+
+
+first_row.append(np.zeros([q4,q4]))
+first_row.append(0.5*jj1)
+final_array.append(first_row)
+second_row.append(0.5*jj2)
+second_row.append(0)
+final_array.append(second_row)
+Jj = np.block(
+    final_array
+)
+print("edw einai o Jj", Jj)
