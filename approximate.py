@@ -6,9 +6,13 @@ import random
 from math import exp, log
 
 ###################### basic settings
-n = 4
-m = 2
-p = n*m+n + 1
+m = 3
+n = 5
+p = m + n #dokimastiki timi
+q = m*n + n + 1
+q2 = m*n + n + 2
+q3 = m*n + n
+q4 = m*n + n + 3
 iterations = 150
 np.random.seed(5)
 
@@ -26,6 +30,12 @@ ksilocal = 0.7676
 zedge = 0.02862
 ksiedge = 0.06706
 alpha = 1 # change from 0.1 to 500 
+h = m -1  #dokimastiki timi
+jj_row = 2 #dokimastiki timi
+ptx = 85
+prx = 99
+le = 7
+lt = 8
 
 #################### functions
 def gompertz_local (s, remote): # remote == True for edge gompertz function. 
@@ -55,118 +65,399 @@ def calculate_hyperplane_approximation(trans_time): #TODO substitute with gomper
 
     return a,b,c
 
+#arithmisi apo to 0 sto up
+def create_up(sp):
+    up = np.zeros([n*m + n + 3, 1])
+    up[sp-1][0] = 1
+    #print(up)
+    return up
+
+
+def diag_up(sp):
+    up = np.zeros([n*m + n + 3, n*m + n + 3])
+    up[sp-1][sp-1] = 1
+    return up
+
 def initilization(s):
-    ################ auxiliary variables
-    li = np.empty((n,1), float)
-    Li = np.empty((n,1), float)
-    gi = np.empty((n,1), float)
-    dij = np.empty((n*m,1), float)
-    Dij = np.empty((n*m,1), float)
-    Gij = np.empty((n*m,1), float)
-    index = 0
-    for i in range (n):
-        li[i][0] = ksilocal*d[i]+zlocal
-        Li[i][0] = ksilocal*d[i]+zlocal-alpha * gompertz_local(1,False)
-        gi[i][0] = gompertz_local(1,False)
-        for j in range (m):
-            dij[index][0] = s[i]*d[i] / R[i][j]
-            Dij[index][0] = s[i]*d[i] / R[i][j] - alpha * gompertz_local(s[i],True)
-            Gij[index][0] = gompertz_local(s[i],True)
-            index +=1 
-    b0 = np.concatenate((Li,Dij),axis=0)
-    c0 = np.concatenate((li,dij),axis=0)
-    d0 = np.concatenate((gi,Gij),axis=0)
-    ########### Matrix A_0
-    B=[]
-    A1 = np.zeros([n,n])
-    A2 = np.zeros([n,m])
-    A3 = np.zeros([m,n])
-    A4 = np.diag(np.full(m,ksiedge))
+    C1 = np.zeros([q,q])
+    #a0 = np.ones([q,1])
+    a1 = np.zeros([q,1])
+    #a2 = np.ones([1,q])
+    a3 = np.zeros([1,q])
+    a4 = np.zeros([2,1])
+    a5 = np.zeros([1,2])
+    a6 = np.zeros([2,2])
+    aq2 = np.zeros([q2,q2])
 
-    # print (Dij)
+    w = np.empty((1,n), float)
+    for i in range(n):
+        w[0][i] = i
+    print(w)
 
-    first_row = []
-    final_matrix = []
-    for j in range(n+1):
-        if j == 0:
-            first_row.append(A1)
-        else:
-            first_row.append(A2) 
-    final_matrix.append(first_row)
-    row = []
-    for j in range(n+1):
-        if j == 0:
-            row.append(A3)
-        else:
-            row.append(A4) 
-    for j in range(n):
-        final_matrix.append(row)
-    B = np.block(
-        final_matrix
+    g0 = []
+    g0.append(w)
+    g0.append(np.zeros([1,q - n]))
+    g1 = np.block(
+        g0
     )
-    # print (B)
-    # print (B.shape)
+    print(g1)
+    a0 = np.empty((q,1), float)
+    for i in range(q):
+        a0[i][0] = g1[0][i]
 
-    ########### Matrix B_0 for objective function
-    column_to_be_added = np.full((p,1),0.5*b0)
-    B0 = np.hstack((B,column_to_be_added))
-    column_to_be_added = np.append(column_to_be_added, [0])
-    B0 = np.vstack((B0,column_to_be_added))
+    A0=[]
+    row1 =[]
+    row2 = []
+    row3 = []
+    fini = []
+    row1.append(C1)
+    row1.append(a0)
+    row1.append(a1)
+    fini.append(row1)
+    row2.append(g1)
+    row2.append(a5)
+    fini.append(row2)
+    row3.append(a3)
+    row3.append(a5)
+    fini.append(row3)
+
+    A0 = np.block(
+        fini
+    )
+    print(A0)
+    # a2 einai o a2, g3 einai o adj tou a2
+    g2 = []
+    g2.append(np.zeros([1,q2 - 2]))
+    g2.append(-1)
+    g2.append(0)
+    g3 = np.block(
+        g2
+    )
+
+    a2 = np.empty((q2,1), float)
+    for i in range(q2):
+        a2[i][0] = g3[0][i]
+    print(a2)
+
+    #b2 einai o b2, g5 einai o adj tou b2
+    g4 =[]
+    g4.append(w)
+    g4.append(np.zeros([1,q2 - n + 1]))
+    g5 = np.block(
+        g4
+    )
+    b2 = np.empty((q2+1,1), float)
+    for i in range(q2+1):
+        b2[i][0] = g5[0][i]
+    print(b2)
+
+    A2 = []
+    a21 =[]
+    r1 =[]
+    r2 = []
+    r1.append(aq2)
+    r1.append(0.5 * a2)
+    a21.append(r1)
+    r2.append(0.5 * g3)
+    r2.append(0)
+    a21.append(r2)
+    A2 = np.block(
+        a21
+    )
+    print(A2)
 
 
-    ########### Matrix B_1 for constraint 9b    
-    column_to_be_added = np.full((p,1),0.5*c0)
-    B1 = np.hstack((B,column_to_be_added))
-    column_to_be_added = np.append(column_to_be_added, [0])
-    B1 = np.vstack((B1,column_to_be_added))
+    a31 = []
+    for i in range(m + 1):
+        a31.append(np.identity(n))
+    a31.append(np.zeros([n,3]))
+    A3 = np.block(
+        a31
+    )
+    print(A3)
 
-    ####################### matrix B2 for constraint 9c 
-    B2 = np.zeros([p,p])
-    column_to_be_added = np.full((p,1),-0.5*d0)
-    B2 = np.hstack((B2,column_to_be_added))
-    column_to_be_added = np.append(column_to_be_added, [0])
-    B2 = np.vstack((B2,column_to_be_added))
-    # print (B2)
+    ro1 = []
+    ro2 = []
+    ro3 = []
+    a41 = []
+    A4 =[]
+    ro1.append(np.zeros([q3,q3]))
+    ro1.append(np.zeros([q3,1]))
+    ro1.append(np.zeros([q3,2]))
+    a41.append(ro1)
+    ro2.append(np.zeros([1,q3]))
+    ro2.append(1)
+    ro2.append(np.zeros([1,2]))
+    a41.append(ro2)
+    ro3.append(np.zeros([2,q3]))
+    ro3.append(np.zeros([2,1]))
+    ro3.append(np.zeros([2,2]))
+    a41.append(ro3)
+    A4 = np.block(
+        a41
+    )
+    print(A4)
+
+    #k4 einai o adj tou b4
+    b41 = []
+    k4 = []
+    b41.append(np.zeros([1,q]))
+    b41.append(-1)
+    b41.append(0)
+    k4 = np.block(
+        b41
+    )
+    b4 = np.empty((q+2,1), float)
+    for i in range(q+2):
+        b4[i][0] = k4[0][i]
+    print(b4)
 
 
-    ####################### matrix B3 for constraint 9d 
-    B3=[]
-    for i in range (n): # we have n constraints of this form
-        A3 = np.zeros([p,p])
-        column_to_be_added = np.zeros([p,1])
-        column_to_be_added[i,0] = 0.5
-        for k in range (m):
-            column_to_be_added[i*m+n+k,0] = 0.5 
-        A3 = np.hstack((A3,column_to_be_added))
-        column_to_be_added = np.append(column_to_be_added, [0])
-        A3 = np.vstack((A3,column_to_be_added))
-        B3.append(A3)
 
-    ####################### matrix B4 for constraint 9E 
-    B4=[]
-    for i in range (m):   # we have m constraints of this form
-        A4 = np.zeros([p,p])
-        column_to_be_added = np.zeros([p,1])
-        for k in range (n):
-            column_to_be_added[k*m+n+i,0] = 0.5 
-        A4 = np.hstack((A4,column_to_be_added))
-        column_to_be_added = np.append(column_to_be_added, [0])
-        A4 = np.vstack((A4,column_to_be_added))
-        B4.append(A4)
+    b51 = []
+    k5 = []
+    b51.append(np.zeros([1,q3]))
+    b51.append(-1)
+    b51.append(np.zeros([1,2]))
+    k5 = np.block(
+        b51
+    )
+    b5 = np.empty((q3+3,1), float)
+    for i in range(q3+3):
+        b5[i][0] = k5[0][i]
+    print(b5)
 
-    ####################### matrix B5 for constraint 9f
-    B5=[]
-    for i in range (p):   # we have p constraints of this form
-        A5 = np.zeros((p,p))
-        A5[i][i] = 1
-        column_to_be_added = np.zeros([p,1])
-        column_to_be_added[i] = -0.5 
-        A5 = np.hstack((A5,column_to_be_added))
-        column_to_be_added = np.append(column_to_be_added, [0])
-        A5 = np.vstack((A5,column_to_be_added))
-        B5.append(A5)
 
-    return B0,B1,B2,B3,B4,B5
+    dul = np.empty((n,m), float)
+    ddl = np.empty((n,m), float)
+    Dk = np.empty((n,m), float)
+
+    #dinw arxikes times stous pinakes dul kai ddl kai Dk gia testing
+    for i in range(n):
+        for j in range(m):
+            dul[i][j] = 4
+            ddl[i][j] = 5
+            Dk[i][j] = 6
+
+
+
+    #edw 3ekinaei to ktisimo tou b0',o opios  einai o pt3
+    pt1 = []
+    pt2 = []
+
+    for i in range(m):
+        for j in range(n):
+            pt1.append(ptx * dul[j][i])
+            pt2.append(prx * ddl[j][i])
+
+    #print(pt1)
+    pt11 = np.empty((n*m,1), float)
+    for i in range(n*m):
+        pt11[i][0] = pt1[i]
+    #print(pt11)
+    pt22 = np.empty((n*m,1), float)
+    for i in range(n*m):
+        pt22[i][0] = pt2[i]
+    #print(pt22)
+
+
+    #pt3 einai o b0'
+    pt3 = np.empty((n*m,1), float)
+    for i in range(n*m):
+        pt3[i][0] = pt11[i][0] + pt22[i][0]
+    #print("edw einai o bo'", pt3)
+
+    #gia ton b0
+    b0 = np.empty((q+2,1), float)
+    for i in range(n):
+        b0[i][0] = 0
+    for i in range(n*m):
+        b0[i+n][0] = le * pt3[i][0]
+    b0[n+n*m] = 0
+    b0[n+n*m + 1] = 0
+    b0[n+n*m + 2] = lt 
+
+    #print("edw einai o b0", b0)
+
+    #gia ton A1
+    A111 = []
+    A11 = []
+    A1 = []
+    for i in range(m):
+        A111.append(np.zeros([1,n]))
+        for j in range(i):
+            A111.append(np.zeros([1,n]))
+        A111.append(Dk[i])
+        for coun in range(m-i):
+            A111.append(np.zeros([1,n]))
+        A111.append(0)
+        A111.append(0)
+        A111.append(-1)
+    # print(A111)
+    #A11 = np.hstack((A111))
+        A11.append(A111)
+    #  print(A11)
+        A111 = []
+    # print(A11)
+    # print(Dk[i])
+    A1 = np.block(
+            A11
+        )
+    print(A1)
+
+    
+
+
+    # x = create_up(4)
+    # print(diag_up(4))
+
+
+    #SDR arrays
+    B00 =[]
+    first_row = []
+    second_row = []
+    final_array = []
+    #b0t einai o adj tou b0
+    b0t = np.empty((1, q+2), float)
+    for i in range(q+2):
+        b0t[0][i] = b0[i][0]
+
+
+
+    first_row.append(A0)
+    #print("edw first row " ,first_row)
+    first_row.append(0.5*b0)
+    final_array.append(first_row)
+    #print("edw final arr", final_array)
+    second_row.append(0.5*b0t)
+    #print("edw second row " ,second_row)
+    second_row.append(0)
+    #print("edw second row " ,second_row)
+    final_array.append(second_row)
+    #print("edw final arr", final_array)
+    B00 = np.block(
+        final_array
+    )
+    #print("edw eibai o B0", B00)
+
+
+    #b2 einai o b2, g5 einai o adj tou b2
+    B20 = []
+    first_row = []
+    second_row = []
+    final_array = []
+    #print("first, sec,...", first_row, second_row, final_array)
+
+    first_row.append(A2)
+    first_row.append(0.5*b2)
+    final_array.append(first_row)
+    second_row.append(0.5*g5)
+    second_row.append(0)
+    final_array.append(second_row)
+    B20 = np.block(
+        final_array
+    )
+    #print("edw einai o B2", B20)
+
+    #k4 einai o adj tou b4
+    B40 = []
+    first_row = []
+    second_row = []
+    final_array = []
+
+    first_row.append(A4)
+    first_row.append(0.5*b4)
+    final_array.append(first_row)
+    second_row.append(0.5*k4)
+    second_row.append(0)
+    final_array.append(second_row)
+    B40 = np.block(
+        final_array
+    )
+    #print("edw einai o B4", B40)
+
+    #k5 einai o adj tou b5
+    B50 = []
+    first_row = []
+    second_row = []
+    final_array = []
+
+    first_row.append(np.zeros([q4,q4]))
+    first_row.append(0.5*b5)
+    final_array.append(first_row)
+    second_row.append(0.5*k5)
+    second_row.append(0)
+    final_array.append(second_row)
+    B50 = np.block(
+        final_array
+    )
+    #print("edw einai o B5", B50)
+
+    #Gp 
+    Gp = []
+    first_row = []
+    second_row = []
+    final_array = []
+
+    up_adj = np.zeros([1, n*m + n + 3])
+    up_adj[0][p-1] = 1
+    first_row.append(diag_up(p))
+    first_row.append(-0.5*create_up(p))
+    final_array.append(first_row)
+    second_row.append(-0.5*up_adj)
+    second_row.append(0)
+    final_array.append(second_row)
+    Gp = np.block(
+        final_array
+    )
+    #print("edw einai o Gp", Gp)
+
+    #Hh
+    Hh = []
+    first_row = []
+    second_row = []
+    final_array = []
+    hh1 = np.zeros([n+ m*n + 3 ,1])  #grammi h tou A1 kai adj tis grammis
+    hh2 = np.zeros([1,n+ m*n + 3])
+    for i in range(n+ m*n + 3):
+        hh1[i][0] = A1[h-1][i]
+        hh2[0][i] = A1[h-1][i]
+
+    first_row.append(np.zeros([q4,q4]))
+    first_row.append(0.5*hh1)
+    final_array.append(first_row)
+    second_row.append(0.5*hh2)
+    second_row.append(0)
+    final_array.append(second_row)
+    Hh = np.block(
+        final_array
+    )
+    #print("edw einai o Hh", Hh)
+
+    #Jj
+    Jj = []
+    first_row = []
+
+    second_row = []
+    final_array = []
+    jj1 = np.zeros([m*n + 3 + n,1])  #grammi jj_row tou A3 kai adj tis grammis
+    jj2 = np.zeros([1,m*n + n + 3])
+    for i in range(m*n + 3 + n):
+        jj1[i][0] = A3[jj_row-1][i]
+        jj2[0][i] = A3[jj_row-1][i]
+
+    first_row.append(np.zeros([q4,q4]))
+    first_row.append(0.5*jj1)
+    final_array.append(first_row)
+    second_row.append(0.5*jj2)
+    second_row.append(0)
+    final_array.append(second_row)
+    Jj = np.block(
+        final_array
+    )
+    #print("edw einai o Jj", Jj)
+
+    return B00,B20,B40,B50,Gp,Hh, Jj
 
 def scaling_problem(sdr_solution):
     # print("Start of scaling Problem")
