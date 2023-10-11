@@ -8,7 +8,7 @@ from math import exp, log
 ###################### basic settings
 n = 4
 m = 2
-p = n*m+n
+p = n*m+n + 1
 iterations = 150
 np.random.seed(5)
 
