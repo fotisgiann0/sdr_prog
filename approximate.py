@@ -7,7 +7,7 @@ from math import exp, log
 
 ###################### basic settings
 m = 3
-n = 5
+n = 10
 p = m + n #dokimastiki timi
 q = m*n + n + 1
 q2 = m*n + n + 2
@@ -80,13 +80,11 @@ def diag_up(sp):
 
 def initilization(s):
     C1 = np.zeros([q,q])
-    #a0 = np.ones([q,1])
     a1 = np.zeros([q,1])
-    #a2 = np.ones([1,q])
     a3 = np.zeros([1,q])
     a4 = np.zeros([2,1])
     a5 = np.zeros([1,2])
-    a6 = np.zeros([2,2])
+    #a6 = np.zeros([2,2])
     aq2 = np.zeros([q2,q2])
 
     w = np.empty((1,n), float)
@@ -457,7 +455,7 @@ def initilization(s):
     )
     #print("edw einai o Jj", Jj)
 
-    return B00,B20,B40,B50,Gp,Hh, Jj
+    return B00,B20,B40,B50,Gp,Hh,Jj
 
 def scaling_problem(sdr_solution):
     # print("Start of scaling Problem")
