@@ -8,7 +8,7 @@ from math import exp, log
 ###################### basic settings
 m = 3
 n = 10
-p = m + n #dokimastiki timi
+p = n*m + n #dokimastiki timi
 q = m*n + n + 1
 q2 = m*n + n + 2
 q3 = m*n + n
@@ -32,10 +32,21 @@ ksiedge = 0.06706
 alpha = 1 # change from 0.1 to 500 
 h = m -1  #dokimastiki timi
 jj_row = 2 #dokimastiki timi
-ptx = 85
-prx = 99
-le = 7
-lt = 8
+ptx = 1.285
+prx = 1.181
+le = 0.5
+lt = 1 - le
+ai = 0.5
+L = 100
+rmin = 200 * (10^6)
+rmax = 800 * (10^6)
+bi = 0.2 * ai
+wi = 330 * ai
+m_elliniko = 10
+w = np.empty((1,n), float)
+for i in range(n):
+    w[0][i] = 330 * ai
+#print(w)
 
 #################### functions
 def gompertz_local (s, remote): # remote == True for edge gompertz function. 
@@ -87,10 +98,10 @@ def initilization(s):
     #a6 = np.zeros([2,2])
     aq2 = np.zeros([q2,q2])
 
-    w = np.empty((1,n), float)
-    for i in range(n):
-        w[0][i] = i
-    print(w)
+    # w = np.empty((1,n), float)
+    # for i in range(n):
+    #     w[0][i] = i
+    # print(w)
 
     g0 = []
     g0.append(w)
@@ -527,14 +538,15 @@ def scaling_problem(sdr_solution):
 
 
 def sdr_offloading(B0,B1,B2,B3,B4,B5):     
-    X = cp.Variable((p+1,p+1), symmetric=True)
+    X = cp.Variable((q4+1,q4+1), symmetric=True)
     constraints= []
     constraints += [X >> 0]              # The operator >> denotes matrix inequality.
-    constraints += [cp.trace(B1 @ X) <= Lmax*n]
-    constraints += [cp.trace(B2 @ X) <= -Amin*n]
-    constraints += [cp.trace(B3[i] @ X) == 1 for i in range(n)]
-    constraints += [cp.trace(B4[i] @ X) <= bmax[i] for i in range(m)]
-    constraints += [cp.trace(B5[i] @ X) == 0 for i in range(p)]
+    constraints += [cp.trace(B4 @ X) == 0]
+    constraints += [cp.trace(B2 @ X) <= 0]
+    constraints += [cp.trace(B5 @ X) <= rmax & cp.trace(B5 @ X) >= rmin]
+    constraints += [cp.trace(Jj[i] @ X) == 1 for i in range(n)]
+    constraints += [cp.trace(Hh[i] @ X) <= 0 for i in range(m)]
+    constraints += [cp.trace(Gp[i] @ X) == 0 for i in range(p)]
     # constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1
     # constraints += [ X>= 0]    
 
