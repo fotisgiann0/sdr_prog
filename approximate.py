@@ -30,18 +30,13 @@ ksilocal = 0.7676
 zedge = 0.02862
 ksiedge = 0.06706
 alpha = 1 # change from 0.1 to 500 
-h = m -1  #dokimastiki timi
-jj_row = 2 #dokimastiki timi
 ptx = 1.285
 prx = 1.181
 le = 0.5
 lt = 1 - le
-#ai = 0.5
 L = 100
 rmin = 200 * (10^6)
 rmax = 800 * (10^6)
-#bi = 0.2 * ai
-#wi = 330 * ai
 m_elliniko = 10
 Ck_ul = np.random.uniform(10,20,size=(m,))
 Ck_dl = np.random.uniform(10,20,size=(m,))
@@ -109,11 +104,6 @@ def initilization(s):
     a5 = np.zeros([1,2])
     #a6 = np.zeros([2,2])
     aq2 = np.zeros([q2,q2])
-
-    # w = np.empty((1,n), float)
-    # for i in range(n):
-    #     w[0][i] = i
-    # print(w)
 
     g0 = []
     g0.append(w)
@@ -258,7 +248,7 @@ def initilization(s):
         for j in range(m):
             dul[i][j] = ai[i] / Ck_ul[j]
             ddl[i][j] = bi[i] / Ck_dl[j]
-            Dk[i][j] = dul[i][j] + ddl[i][j] + w[0][i] / r_k[j]
+            Dk[i][j] = dul[i][j] + ddl[i][j] + (w[0][i] / r_k[j])
 
 
 
@@ -328,11 +318,6 @@ def initilization(s):
 
     
 
-
-    # x = create_up(4)
-    # print(diag_up(4))
-
-
     #SDR arrays
     B00 =[]
     first_row = []
@@ -346,16 +331,11 @@ def initilization(s):
 
 
     first_row.append(A0)
-    #print("edw first row " ,first_row)
     first_row.append(0.5*b0)
     final_array.append(first_row)
-    #print("edw final arr", final_array)
     second_row.append(0.5*b0t)
-    #print("edw second row " ,second_row)
     second_row.append(0)
-    #print("edw second row " ,second_row)
     final_array.append(second_row)
-    #print("edw final arr", final_array)
     B00 = np.block(
         final_array
     )
@@ -415,70 +395,78 @@ def initilization(s):
     #print("edw einai o B5", B50)
 
     #Gp 
-    Gp = []
-    first_row = []
-    second_row = []
-    final_array = []
+    Gp_ol = []
+    for j in range(n*m + m):
+        Gp = []
+        first_row = []
+        second_row = []
+        final_array = []
 
-    up_adj = np.zeros([1, n*m + n + 3])
-    up_adj[0][p-1] = 1
-    first_row.append(diag_up(p))
-    first_row.append(-0.5*create_up(p))
-    final_array.append(first_row)
-    second_row.append(-0.5*up_adj)
-    second_row.append(0)
-    final_array.append(second_row)
-    Gp = np.block(
+        up_adj = np.zeros([1, n*m + n + 3])
+        up_adj[0][j] = 1
+        first_row.append(diag_up(j))
+        first_row.append(-0.5*create_up(j))
+        final_array.append(first_row)
+        second_row.append(-0.5*up_adj)
+        second_row.append(0)
+        final_array.append(second_row)
+        Gp = np.block(
+            final_array
+        )
+        Gp_ol.append(Gp)
+
+    Hh_ol = []
+    for j in range(m):
+        Hh = []
+        first_row = []
+        second_row = []
+        final_array = []
+        hh1 = np.zeros([n+ m*n + 3 ,1])  #grammi h tou A1 kai adj tis grammis
+        hh2 = np.zeros([1,n+ m*n + 3])
+        for i in range(n+ m*n + 3):
+            hh1[i][0] = A1[j][i]
+            hh2[0][i] = A1[j][i]
+
+
+        first_row.append(np.zeros([q4,q4]))
+        first_row.append(0.5*hh1)
+        final_array.append(first_row)
+        second_row.append(0.5*hh2)
+        second_row.append(0)
+        final_array.append(second_row)
+        Hh = np.block(
         final_array
-    )
-    #print("edw einai o Gp", Gp)
-
-    #Hh
-    Hh = []
-    first_row = []
-    second_row = []
-    final_array = []
-    hh1 = np.zeros([n+ m*n + 3 ,1])  #grammi h tou A1 kai adj tis grammis
-    hh2 = np.zeros([1,n+ m*n + 3])
-    for i in range(n+ m*n + 3):
-        hh1[i][0] = A1[h-1][i]
-        hh2[0][i] = A1[h-1][i]
-
-    first_row.append(np.zeros([q4,q4]))
-    first_row.append(0.5*hh1)
-    final_array.append(first_row)
-    second_row.append(0.5*hh2)
-    second_row.append(0)
-    final_array.append(second_row)
-    Hh = np.block(
-        final_array
-    )
-    #print("edw einai o Hh", Hh)
+        )
+        #print("edw einai o Hh", Hh)
+        Hh_ol.append(Hh)
 
     #Jj
-    Jj = []
-    first_row = []
+    Jj_ol = []
+    for j in range(n):
+        Jj = []
+        first_row = []
 
-    second_row = []
-    final_array = []
-    jj1 = np.zeros([m*n + 3 + n,1])  #grammi jj_row tou A3 kai adj tis grammis
-    jj2 = np.zeros([1,m*n + n + 3])
-    for i in range(m*n + 3 + n):
-        jj1[i][0] = A3[jj_row-1][i]
-        jj2[0][i] = A3[jj_row-1][i]
+        second_row = []
+        final_array = []
+        jj1 = np.zeros([m*n + 3 + n,1])  #grammi jj_row tou A3 kai adj tis grammis
+        jj2 = np.zeros([1,m*n + n + 3])
+        for i in range(m*n + 3 + n):
+            jj1[i][0] = A3[j][i]
+            jj2[0][i] = A3[j][i]
 
-    first_row.append(np.zeros([q4,q4]))
-    first_row.append(0.5*jj1)
-    final_array.append(first_row)
-    second_row.append(0.5*jj2)
-    second_row.append(0)
-    final_array.append(second_row)
-    Jj = np.block(
-        final_array
-    )
-    #print("edw einai o Jj", Jj)
 
-    return B00,B20,B40,B50,Gp,Hh,Jj
+        first_row.append(np.zeros([q4,q4]))
+        first_row.append(0.5*jj1)
+        final_array.append(first_row)
+        second_row.append(0.5*jj2)
+        second_row.append(0)
+        final_array.append(second_row)
+        Jj = np.block(
+            final_array
+        )
+        Jj_ol.append(Jj)
+
+    return B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol
 
 def scaling_problem(sdr_solution):
     # print("Start of scaling Problem")

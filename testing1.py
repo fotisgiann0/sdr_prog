@@ -350,67 +350,79 @@ B50 = np.block(
 print("edw einai o B5", B50)
 
 #Gp 
-Gp = []
-first_row = []
-second_row = []
-final_array = []
+Gp_ol = []
+for j in range(m*n + n):
+    Gp = []
+    first_row = []
+    second_row = []
+    final_array = []
 
-up_adj = np.zeros([1, n*m + n + 3])
-up_adj[0][p-1] = 1
-first_row.append(diag_up(p))
-first_row.append(-0.5*create_up(p))
-final_array.append(first_row)
-second_row.append(-0.5*up_adj)
-second_row.append(0)
-final_array.append(second_row)
-Gp = np.block(
-    final_array
-)
-print("edw einai o Gp", Gp)
+    up_adj = np.zeros([1, n*m + n + 3])
+    up_adj[0][j] = 1
+    first_row.append(diag_up(j))
+    first_row.append(-0.5*create_up(j))
+    final_array.append(first_row)
+    second_row.append(-0.5*up_adj)
+    second_row.append(0)
+    final_array.append(second_row)
+    Gp = np.block(
+        final_array
+    )
+    Gp_ol.append(Gp)
+#     print("edw einai o Gp", Gp)
+#print("edw einai o Gp", Gp_ol[m*n + n - 1] == Gp)
 
 #Hh
-Hh = []
-first_row = []
-second_row = []
-final_array = []
-hh1 = np.zeros([n+ m*n + 3 ,1])  #grammi h tou A1 kai adj tis grammis
-hh2 = np.zeros([1,n+ m*n + 3])
-for i in range(n+ m*n + 3):
-    hh1[i][0] = A1[h-1][i]
-    hh2[0][i] = A1[h-1][i]
+Hh_ol = []
+for j in range(m):
+    Hh = []
+    first_row = []
+    second_row = []
+    final_array = []
+    hh1 = np.zeros([n+ m*n + 3 ,1])  #grammi h tou A1 kai adj tis grammis
+    hh2 = np.zeros([1,n+ m*n + 3])
+    for i in range(n+ m*n + 3):
+        hh1[i][0] = A1[j][i]
+        hh2[0][i] = A1[j][i]
 
 
-first_row.append(np.zeros([q4,q4]))
-first_row.append(0.5*hh1)
-final_array.append(first_row)
-second_row.append(0.5*hh2)
-second_row.append(0)
-final_array.append(second_row)
-Hh = np.block(
+    first_row.append(np.zeros([q4,q4]))
+    first_row.append(0.5*hh1)
+    final_array.append(first_row)
+    second_row.append(0.5*hh2)
+    second_row.append(0)
+    final_array.append(second_row)
+    Hh = np.block(
     final_array
-)
-print("edw einai o Hh", Hh)
+    )
+    #print("edw einai o Hh", Hh)
+    Hh_ol.append(Hh)
+#print("edw einai o olikos", Hh_ol[0])
 
 #Jj
-Jj = []
-first_row = []
+Jj_ol = []
+for j in range(n):
+    Jj = []
+    first_row = []
 
-second_row = []
-final_array = []
-jj1 = np.zeros([m*n + 3 + n,1])  #grammi jj_row tou A3 kai adj tis grammis
-jj2 = np.zeros([1,m*n + n + 3])
-for i in range(m*n + 3 + n):
-    jj1[i][0] = A3[jj_row-1][i]
-    jj2[0][i] = A3[jj_row-1][i]
+    second_row = []
+    final_array = []
+    jj1 = np.zeros([m*n + 3 + n,1])  #grammi jj_row tou A3 kai adj tis grammis
+    jj2 = np.zeros([1,m*n + n + 3])
+    for i in range(m*n + 3 + n):
+        jj1[i][0] = A3[j][i]
+        jj2[0][i] = A3[j][i]
 
 
-first_row.append(np.zeros([q4,q4]))
-first_row.append(0.5*jj1)
-final_array.append(first_row)
-second_row.append(0.5*jj2)
-second_row.append(0)
-final_array.append(second_row)
-Jj = np.block(
-    final_array
-)
-print("edw einai o Jj", Jj)
+    first_row.append(np.zeros([q4,q4]))
+    first_row.append(0.5*jj1)
+    final_array.append(first_row)
+    second_row.append(0.5*jj2)
+    second_row.append(0)
+    final_array.append(second_row)
+    Jj = np.block(
+        final_array
+    )
+    Jj_ol.append(Jj)
+#     print("edw einai o Jj", Jj)
+# print("edw einai o Jj", Jj_ol[2])
