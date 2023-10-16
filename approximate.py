@@ -36,17 +36,29 @@ ptx = 1.285
 prx = 1.181
 le = 0.5
 lt = 1 - le
-ai = 0.5
+#ai = 0.5
 L = 100
 rmin = 200 * (10^6)
 rmax = 800 * (10^6)
-bi = 0.2 * ai
-wi = 330 * ai
+#bi = 0.2 * ai
+#wi = 330 * ai
 m_elliniko = 10
+Ck_ul = np.random.uniform(10,20,size=(m,))
+Ck_dl = np.random.uniform(10,20,size=(m,))
+ai = np.empty((n), float)
+for i in range(n):
+    ai[i] = 0.5
 w = np.empty((1,n), float)
 for i in range(n):
-    w[0][i] = 330 * ai
-#print(w)
+    w[0][i] = 330 * ai[i]
+bi = np.empty((n), float)
+for i in range(n):
+    bi[i] = 0.2 * ai[i]
+r_k = np.empty((m), float)
+r_k[0] = 1
+r_k[1] = 2
+r_k[2] = 2.2
+
 
 #################### functions
 def gompertz_local (s, remote): # remote == True for edge gompertz function. 
@@ -244,9 +256,9 @@ def initilization(s):
     #dinw arxikes times stous pinakes dul kai ddl kai Dk gia testing
     for i in range(n):
         for j in range(m):
-            dul[i][j] = 4
-            ddl[i][j] = 5
-            Dk[i][j] = 6
+            dul[i][j] = ai[i] / Ck_ul[j]
+            ddl[i][j] = bi[i] / Ck_dl[j]
+            Dk[i][j] = dul[i][j] + ddl[i][j] + w[0][i] / r_k[j]
 
 
 
