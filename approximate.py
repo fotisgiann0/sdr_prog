@@ -537,20 +537,20 @@ def scaling_problem(sdr_solution):
     return slist
 
 
-def sdr_offloading(B0,B1,B2,B3,B4,B5):     
+def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):     
     X = cp.Variable((q4+1,q4+1), symmetric=True)
     constraints= []
     constraints += [X >> 0]              # The operator >> denotes matrix inequality.
-    constraints += [cp.trace(B4 @ X) == 0]
-    constraints += [cp.trace(B2 @ X) <= 0]
-    constraints += [cp.trace(B5 @ X) <= rmax & cp.trace(B5 @ X) >= rmin]
-    constraints += [cp.trace(Jj[i] @ X) == 1 for i in range(n)]
-    constraints += [cp.trace(Hh[i] @ X) <= 0 for i in range(m)]
-    constraints += [cp.trace(Gp[i] @ X) == 0 for i in range(p)]
+    constraints += [cp.trace(B40 @ X) == 0]
+    constraints += [cp.trace(B20 @ X) <= 0]
+    constraints += [cp.trace(B50 @ X) <= rmax & cp.trace(B50 @ X) >= rmin]
+    constraints += [cp.trace(Jj_ol[i] @ X) == 1 for i in range(n)]
+    constraints += [cp.trace(Hh_ol[i] @ X) <= 0 for i in range(m)]
+    constraints += [cp.trace(Gp_ol[i] @ X) == 0 for i in range(p)]
     # constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1
     # constraints += [ X>= 0]    
 
-    prob = cp.Problem(cp.Minimize(1/n*cp.trace(B0 @ X)),
+    prob = cp.Problem(cp.Minimize(1/n*cp.trace(B00 @ X)),
                     constraints)
     # prob.solve(solver="MOSEK", verbose=True)
     # prob.solve(solver="SCS")
@@ -574,9 +574,9 @@ def sdr_offloading(B0,B1,B2,B3,B4,B5):
     minimum_obj = 10000000000000 
     solution=[]
     for l in range (iterations):
-        ksi = np.random.multivariate_normal(np.zeros(p), Xstar, tol=1e-6)
+        ksi = np.random.multivariate_normal(np.zeros(p), Xstar, size = 100,  tol=1e-6)
         # print (ksi)
-        xcandidate = 1/ (1 + np.exp(-20*ksi))   # mapping function
+        xcandidate = 1/ (1 + np.exp(-m_elliniko*ksi))   # mapping function
         column_to_be_added = np.zeros([n,m+1])
         for i in range (n):
             for j in range (m):
@@ -592,10 +592,10 @@ def sdr_offloading(B0,B1,B2,B3,B4,B5):
         pert = np.append(pert,1)
         pert = np.array([pert])
         Y = np.transpose(pert)*pert
-        L = np.trace(B1 @ Y)
-        A = np.trace(B2 @ Y)
-        if L < Lmax*n and A <= -Amin*n and all([np.trace(B3[i] @ Y) == 1 for i in range(n)]) and all ([np.trace(B4[i] @ Y) <= bmax[i] for i in range(m)]):
-            candidate = 1/n*np.trace(B0 @ Y)
+        L = np.trace(B20 @ Y)
+        A = np.trace(B40 @ Y)
+        if L < 0 and A == 0 and all([np.trace(Jj_ol[i] @ Y) == 1 for i in range(n)]) and all ([np.trace(Hh_ol[i] @ Y) <= 0 for i in range(m)]) and all ([np.trace(Gp_ol[i] @ Y) == 0 for i in range(p)]):
+            candidate = 1/n*np.trace(B00 @ Y)
             if candidate < minimum_obj:
                 minimum_obj= candidate
                 solution = pert 
@@ -724,8 +724,8 @@ def main():
     while (True):
         # print ("\n new iteration number: ", counter)
         prev_sol = sdr_solution
-        B0,B1,B2,B3,B4,B5 = initilization(slist)
-        sdr_solution, Lbest, Amax = sdr_offloading(B0,B1,B2,B3,B4,B5) 
+        B0,B1,B2,B3,B4,B5,B6 = initilization(slist)
+        sdr_solution, Lbest, Amax = sdr_offloading(B0,B1,B2,B3,B4,B5,B6) 
         # print (sdr_solution)
         # sdr_solution = random_offloading(B0,B1,B2,B3,B4)
         # sdr_solution, Lbest, Amax  = implement_brute_force(B0,B1,B2,B3,B4,B5)
