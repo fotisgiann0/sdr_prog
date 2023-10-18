@@ -38,6 +38,7 @@ L = 100
 rmin = 200 * (10^6)
 rmax = 800 * (10^6)
 m_elliniko = 10
+p_elliniko = 1.25 * (10^(-26))
 Ck_ul = np.random.uniform(10,20,size=(m,))
 Ck_dl = np.random.uniform(10,20,size=(m,))
 ai = np.empty((n), float)
@@ -53,6 +54,15 @@ r_k = np.empty((m), float)
 r_k[0] = 1
 r_k[1] = 2
 r_k[2] = 2.2
+dul = np.empty((n,m), float)
+ddl = np.empty((n,m), float)
+Dk = np.empty((n,m), float)
+
+for i in range(n):
+    for j in range(m):
+        dul[i][j] = ai[i] / Ck_ul[j]
+        ddl[i][j] = bi[i] / Ck_dl[j]
+        Dk[i][j] = dul[i][j] + ddl[i][j] + (w[0][i] / r_k[j])
 
 
 #################### functions
@@ -95,6 +105,33 @@ def diag_up(sp):
     up = np.zeros([n*m + n + 3, n*m + n + 3])
     up[sp-1][sp-1] = 1
     return up
+
+def calc_r0(pert):
+    sum1 = 0
+    sum2 = 0
+    for i in range(n):
+        sum1 += pert[i][0] * w[0][i]
+    for i in range(n):
+        sum2 += pert[i][0] * Dk[0][i]
+    ru = sum1 / sum2
+    rl = (lt / (2 * le * p_elliniko)) ^ (1/3)
+    if ru < rmin:
+        r0 = rmin
+    elif ru >= rmin & ru <= rmax:
+        if(rl < rmin):
+            r0 = np.argmin(pert)
+        elif rl >= rmin  & rl <= rmax:
+            r0 = np.argmin(pert)
+        else:
+            r0 = ru
+    else:
+        if(rl < rmin):
+            r0 = rmin
+        elif rl >= rmin  & rl <= rmax:
+            r0 = rl
+        else:
+            r0 = rmax
+    return r0
 
 def initilization(s):
     C1 = np.zeros([q,q])
@@ -237,20 +274,6 @@ def initilization(s):
     for i in range(q3+3):
         b5[i][0] = k5[0][i]
     print(b5)
-
-
-    dul = np.empty((n,m), float)
-    ddl = np.empty((n,m), float)
-    Dk = np.empty((n,m), float)
-
-    #dinw arxikes times stous pinakes dul kai ddl kai Dk gia testing
-    for i in range(n):
-        for j in range(m):
-            dul[i][j] = ai[i] / Ck_ul[j]
-            ddl[i][j] = bi[i] / Ck_dl[j]
-            Dk[i][j] = dul[i][j] + ddl[i][j] + (w[0][i] / r_k[j])
-
-
 
     #edw 3ekinaei to ktisimo tou b0',o opios  einai o pt3
     pt1 = []
@@ -600,8 +623,13 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
                 minimum_obj= candidate
                 solution = pert 
                 iteration_best = l
-                Lbest = L/n
-                Amax= -A/n
+                for iter in range(n):
+                    if pert[i][0] != 0:
+                        ro = calc_r0(pert)
+                    else:
+                        ro = (rmin + rmax) / 2
+                #Lbest = L/n
+                #Amax= -A/n
         # else: 
         #     candidate = 1/n*np.trace(B0 @ Y)
         #     if candidate< minimum_obj:
