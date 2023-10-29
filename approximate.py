@@ -39,6 +39,7 @@ rmin = 200 * (10^6)
 rmax = 800 * (10^6)
 m_elliniko = 10
 p_elliniko = 1.25 * (10^(-26))
+z_elliniko = 3
 Ck_ul = np.random.uniform(10,20,size=(m,))
 Ck_dl = np.random.uniform(10,20,size=(m,))
 ai = np.empty((n), float)
@@ -628,8 +629,8 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
                         ro = calc_r0(pert)
                     else:
                         ro = (rmin + rmax) / 2
-                #Lbest = L/n
-                #Amax= -A/n
+                Lbest = L/n
+                Amax= -A/n
         # else: 
         #     candidate = 1/n*np.trace(B0 @ Y)
         #     if candidate< minimum_obj:
@@ -734,11 +735,13 @@ def calculate_cost(solution,B0,B1,B2,B3,B4):
     candidate = 1/n*np.trace(B0 @ Y)
     minimum_obj= candidate
     solution = pert 
-    # print ("L: ", L/n)
-    # print  ("A: ", -A/n)
-    # print ("solution ", solution)
-    # print ("minimum objective ", minimum_obj)
-    total_cost = L/n +alpha*A/n  # + operator because A is negative here due to B2 matrix
+    # ecomp = 
+    # etr = 
+    # tk = 
+    # e(X,r0) = ecomp + etr
+    # t(X,r0) = max(Tk)
+    total_cost = 0
+    # total_cost = lt * t(X,r0) + le * e(X,r0)  # + operator because A is negative here due to B2 matrix
     # print (total_cost)
     return total_cost,L/n,-A/n
 
