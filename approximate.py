@@ -625,7 +625,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
                 solution = pert 
                 iteration_best = l
                 for iter in range(n):
-                    if pert[i][0] != 0:
+                    if pert[iter][0] != 0:
                         ro = calc_r0(pert)
                     else:
                         ro = (rmin + rmax) / 2
