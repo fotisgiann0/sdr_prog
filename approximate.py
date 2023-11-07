@@ -116,11 +116,12 @@ def calc_r0(pert):
         sum2 += pert[i][0] * Dk[0][i]
     ru = sum1 / sum2
     rl = (lt / (2 * le * p_elliniko)) ^ (1/3)
+    r3 , r4 = calculate_cost(pert)
     if ru < rmin:
         r0 = rmin
     elif ru >= rmin & ru <= rmax:
         if(rl < rmin):
-            r0 = np.argmin(pert)
+            r0 = calculate_cost
         elif rl >= rmin  & rl <= rmax:
             r0 = np.argmin(pert)
         else:
