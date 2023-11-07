@@ -724,26 +724,39 @@ def implement_brute_force(B0,B1,B2,B3,B4,B5):
     # print ("minimum objective ", minimum_obj)
     return solution[0], L, A
 
-def calculate_cost(solution,B0,B1,B2,B3,B4):
+#geniki synartisi kostous gia X kai tin trexw kai gia to r0 kai gia to X_0
+def calculate_cost(solution, r):
     pert = solution.tolist()
-    minimum_obj = 10000000000000 
+    #minimum_obj = 10000000000000 
     pert.append(1)
     pert = np.array([pert])
-    Y = np.transpose(pert)*pert
-    L = np.trace(B1 @ Y)
-    A = np.trace(B2 @ Y)
-    candidate = 1/n*np.trace(B0 @ Y)
-    minimum_obj= candidate
+    #Y = np.transpose(pert)*pert
+    #L = np.trace(B1 @ Y)
+    #A = np.trace(B2 @ Y)
+    #candidate = 1/n*np.trace(B0 @ Y)
+    #minimum_obj= candidate
     solution = pert 
-    # ecomp = 
-    # etr = 
-    # tk = 
-    # e(X,r0) = ecomp + etr
-    # t(X,r0) = max(Tk)
-    total_cost = 0
-    # total_cost = lt * t(X,r0) + le * e(X,r0)  # + operator because A is negative here due to B2 matrix
+    ecomp = 0
+    for i in range(n):
+        sum1 = p_elliniko * (r^z_elliniko) * pert[i][0] * Dk[i][0]
+        ecomp = ecomp + sum1
+    etr = 0
+    for j in range(1,m):
+        sum2 = 0
+        for i in range(n):
+            sum2 = sum2 + (ptx  * pert[i][j] * dul[i][j]) + (prx  * pert[i][j] * ddl[i][j])
+        etr = etr + sum2 
+    maxtk = 0
+    for j in range(m):
+        sum3 = 0
+        for i in range(n):
+            sum3 = sum3 + pert[i][j]*Dk[i][j] 
+        if(sum3 > maxtk):
+            maxtk = sum3
+    e_syn = ecomp + etr
+    total_cost = lt * maxtk + le * e_syn  # + operator because A is negative here due to B2 matrix
     # print (total_cost)
-    return total_cost,L/n,-A/n
+    return total_cost, r
 
 def main():
     sdr_solution = [0]
