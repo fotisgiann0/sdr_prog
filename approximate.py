@@ -116,23 +116,24 @@ def calc_r0(pert):
         sum2 += pert[i][0] * Dk[0][i]
     ru = sum1 / sum2
     rl = (lt / (2 * le * p_elliniko)) ^ (1/3)
-    r3 , r4 = calculate_cost(pert)
-    if ru < rmin:
-        r0 = rmin
-    elif ru >= rmin & ru <= rmax:
-        if(rl < rmin):
-            r0 = calculate_cost
-        elif rl >= rmin  & rl <= rmax:
-            r0 = np.argmin(pert)
-        else:
-            r0 = ru
-    else:
-        if(rl < rmin):
-            r0 = rmin
-        elif rl >= rmin  & rl <= rmax:
-            r0 = rl
-        else:
-            r0 = rmax
+    #r3 , r4 = calculate_cost(pert)
+    # if ru < rmin:
+    #     r0 = rmin
+    # elif ru >= rmin & ru <= rmax:
+    #     if(rl < rmin):
+    #         r0 = calculate_cost
+    #     elif rl >= rmin  & rl <= rmax:
+    #         r0 = np.argmin(pert)
+    #     else:
+    #         r0 = ru
+    # else:
+    #     if(rl < rmin):
+    #         r0 = rmin
+    #     elif rl >= rmin  & rl <= rmax:
+    #         r0 = rl
+    #     else:
+    #         r0 = rmax
+    r0 = ru
     return r0
 
 def initilization(s):
@@ -150,7 +151,7 @@ def initilization(s):
     g1 = np.block(
         g0
     )
-    print(g1)
+    #print(g1)
     a0 = np.empty((q,1), float)
     for i in range(q):
         a0[i][0] = g1[0][i]
@@ -174,7 +175,7 @@ def initilization(s):
     A0 = np.block(
         fini
     )
-    print(A0)
+    #print(A0)
     # a2 einai o a2, g3 einai o adj tou a2
     g2 = []
     g2.append(np.zeros([1,q2 - 2]))
@@ -187,7 +188,7 @@ def initilization(s):
     a2 = np.empty((q2,1), float)
     for i in range(q2):
         a2[i][0] = g3[0][i]
-    print(a2)
+    #print(a2)
 
     #b2 einai o b2, g5 einai o adj tou b2
     g4 =[]
@@ -199,7 +200,7 @@ def initilization(s):
     b2 = np.empty((q2+1,1), float)
     for i in range(q2+1):
         b2[i][0] = g5[0][i]
-    print(b2)
+    #print(b2)
 
     A2 = []
     a21 =[]
@@ -214,7 +215,7 @@ def initilization(s):
     A2 = np.block(
         a21
     )
-    print(A2)
+    #print(A2)
 
 
     a31 = []
@@ -224,7 +225,7 @@ def initilization(s):
     A3 = np.block(
         a31
     )
-    print(A3)
+    #print(A3)
 
     ro1 = []
     ro2 = []
@@ -246,7 +247,7 @@ def initilization(s):
     A4 = np.block(
         a41
     )
-    print(A4)
+    #print(A4)
 
     #k4 einai o adj tou b4
     b41 = []
@@ -260,7 +261,7 @@ def initilization(s):
     b4 = np.empty((q+2,1), float)
     for i in range(q+2):
         b4[i][0] = k4[0][i]
-    print(b4)
+    #print(b4)
 
 
 
@@ -275,7 +276,7 @@ def initilization(s):
     b5 = np.empty((q3+3,1), float)
     for i in range(q3+3):
         b5[i][0] = k5[0][i]
-    print(b5)
+    #print(b5)
 
     #edw 3ekinaei to ktisimo tou b0',o opios  einai o pt3
     pt1 = []
@@ -339,7 +340,7 @@ def initilization(s):
     A1 = np.block(
             A11
         )
-    print(A1)
+    #print(A1)
 
     
 
@@ -421,7 +422,7 @@ def initilization(s):
 
     #Gp 
     Gp_ol = []
-    for j in range(n*m + m):
+    for j in range(p):
         Gp = []
         first_row = []
         second_row = []
@@ -568,7 +569,8 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     constraints += [X >> 0]              # The operator >> denotes matrix inequality.
     constraints += [cp.trace(B40 @ X) == 0]
     constraints += [cp.trace(B20 @ X) <= 0]
-    constraints += [cp.trace(B50 @ X) <= rmax & cp.trace(B50 @ X) >= rmin]
+    constraints += [cp.trace(B50 @ X) <= rmax]
+    constraints += [cp.trace(B50 @ X) >= rmin]
     constraints += [cp.trace(Jj_ol[i] @ X) == 1 for i in range(n)]
     constraints += [cp.trace(Hh_ol[i] @ X) <= 0 for i in range(m)]
     constraints += [cp.trace(Gp_ol[i] @ X) == 0 for i in range(p)]
@@ -599,7 +601,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     minimum_obj = 10000000000000 
     solution=[]
     for l in range (iterations):
-        ksi = np.random.multivariate_normal(np.zeros(p), Xstar, size = 100,  tol=1e-6)
+        ksi = np.random.multivariate_normal(np.zeros(p), Xstar,   tol=1e-6) #isws add size =100 arguement
         # print (ksi)
         xcandidate = 1/ (1 + np.exp(-m_elliniko*ksi))   # mapping function
         column_to_be_added = np.zeros([n,m+1])
@@ -625,11 +627,11 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
                 minimum_obj= candidate
                 solution = pert 
                 iteration_best = l
-                for iter in range(n):
-                    if pert[iter][0] != 0:
-                        ro = calc_r0(pert)
-                    else:
-                        ro = (rmin + rmax) / 2
+                # for iter in range(n):
+                #     if pert[iter][0] != 0:
+                #         ro = calc_r0(pert)
+                #     else:
+                #         ro = (rmin + rmax) / 2
                 Lbest = L/n
                 Amax= -A/n
         # else: 
@@ -766,29 +768,33 @@ def main():
     Acurrent = -10000000
     epsilon = 0.01
     counter = 0 
-    while (True):
-        # print ("\n new iteration number: ", counter)
-        prev_sol = sdr_solution
-        B0,B1,B2,B3,B4,B5,B6 = initilization(slist)
-        sdr_solution, Lbest, Amax = sdr_offloading(B0,B1,B2,B3,B4,B5,B6) 
-        # print (sdr_solution)
-        # sdr_solution = random_offloading(B0,B1,B2,B3,B4)
-        # sdr_solution, Lbest, Amax  = implement_brute_force(B0,B1,B2,B3,B4,B5)
-        # slist = random_compression()
-        # print ("Total Cost of Solution: ", calculate_cost(sdr_solution,B0,B1,B2,B3,B4))
-        slist = scaling_problem(sdr_solution)
-        # if not((sdr_solution == prev_sol).all()) and counter != 0 :
-        #     print("different solution found:")
-        #     print ("new solution:" , sdr_solution)
-        # #     print ("previous solution:" ,prev_sol)
-        # if (Lbest-alpha*Amax <= Lcurrent-alpha*Acurrent + epsilon) and (Lbest-alpha*Amax >= Lcurrent-alpha*Acurrent - epsilon):
-        #     # print ("condition2")
-        #     break; 
-        # Lcurrent = Lbest
-        # Acurrent = Amax
-        counter +=1
-        break;
-    total_cost, Lfinal,Afinal = calculate_cost(sdr_solution,B0,B1,B2,B3,B4)
+    r1 = 1
+    prev_sol = sdr_solution
+    B0,B1,B2,B3,B4,B5,B6 = initilization(slist)
+    sdr_solution, Lbest, Amax = sdr_offloading(B0,B1,B2,B3,B4,B5,B6) 
+    # while (True):
+    #     # print ("\n new iteration number: ", counter)
+    #     prev_sol = sdr_solution
+    #     B0,B1,B2,B3,B4,B5,B6 = initilization(slist)
+    #     sdr_solution, Lbest, Amax = sdr_offloading(B0,B1,B2,B3,B4,B5,B6) 
+    #     # print (sdr_solution)
+    #     # sdr_solution = random_offloading(B0,B1,B2,B3,B4)
+    #     # sdr_solution, Lbest, Amax  = implement_brute_force(B0,B1,B2,B3,B4,B5)
+    #     # slist = random_compression()
+    #     # print ("Total Cost of Solution: ", calculate_cost(sdr_solution,B0,B1,B2,B3,B4))
+    #     slist = scaling_problem(sdr_solution)
+    #     # if not((sdr_solution == prev_sol).all()) and counter != 0 :
+    #     #     print("different solution found:")
+    #     #     print ("new solution:" , sdr_solution)
+    #     # #     print ("previous solution:" ,prev_sol)
+    #     # if (Lbest-alpha*Amax <= Lcurrent-alpha*Acurrent + epsilon) and (Lbest-alpha*Amax >= Lcurrent-alpha*Acurrent - epsilon):
+    #     #     # print ("condition2")
+    #     #     break; 
+    #     # Lcurrent = Lbest
+    #     # Acurrent = Amax
+    #     counter +=1
+    #     break;
+    total_cost, Lfinal,Afinal = calculate_cost(sdr_solution,r1)
     print (total_cost)
     print (Lfinal,Afinal)
     return 
