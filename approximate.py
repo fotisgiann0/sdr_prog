@@ -8,7 +8,7 @@ from math import exp, log
 ###################### basic settings
 m = 3
 n = 10
-p = n*m + n #dokimastiki timi
+p = n*m + n 
 q = m*n + n + 1
 q2 = m*n + n + 2
 q3 = m*n + n
@@ -597,7 +597,8 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     ############# mapping to feasible solution 
     iteration_best = -1
     Xstar = X.value
-    Xstar = Xstar[:-1,:-1]
+    Xstar = Xstar[:-4,:-4]
+    print(len(Xstar))
     minimum_obj = 10000000000000 
     solution=[]
     for l in range (iterations):
