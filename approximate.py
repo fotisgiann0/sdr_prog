@@ -600,7 +600,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     Xstar = Xstar[:-4,:-4]
     print(len(Xstar))
     minimum_obj = 10000000000000 
-    solution=[]
+    solution=[0,1,1]
     for l in range (iterations):
         ksi = np.random.multivariate_normal(np.zeros(p), Xstar,   tol=1e-6) #isws add size =100 arguement
         # print (ksi)
@@ -612,7 +612,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
                 column_to_be_added[i][j+1] = f'{xcandidate[n+m*i+j]:.20f}'
         b = np.zeros_like(column_to_be_added)
         b[np.arange(len(column_to_be_added)), column_to_be_added.argmax(1)] = 1
-        pert = np.zeros([n*m+n, 1])
+        pert = np.zeros([n*m+n+3, 1])
         for i in range(n):
             for j in range(m):
                 pert[i][0] = b[i][0]
@@ -623,7 +623,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
         L = np.trace(B20 @ Y)
         A = np.trace(B40 @ Y)
         if L < 0 and A == 0 and all([np.trace(Jj_ol[i] @ Y) == 1 for i in range(n)]) and all ([np.trace(Hh_ol[i] @ Y) <= 0 for i in range(m)]) and all ([np.trace(Gp_ol[i] @ Y) == 0 for i in range(p)]):
-            candidate = 1/n*np.trace(B00 @ Y)
+            candidate = np.trace(B00 @ Y)
             if candidate < minimum_obj:
                 minimum_obj= candidate
                 solution = pert 
@@ -643,9 +643,11 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
         #         print ("solution ", pert)
 
     # print ("iteration number to find optimal SDR solution: ", iteration_best)
-    # print ("minimum objective ", minimum_obj)     
+    # print ("minimum objective ", minimum_obj)  
+    print ("pert ", pert)
+    print ("solution array", solution)   
     sdr_solution = solution[0][:-1]
-    # print ("solution ", sdr_solution)
+    print ("solution ", sdr_solution)
 
     # compute best L and A
     # print ("Lbest: ", Lbest)

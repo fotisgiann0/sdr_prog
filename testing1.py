@@ -2,12 +2,12 @@ import numpy as np
 
 ksiedge = 4
 m = 3
-n = 5
+n = 10
 q = m*n + n + 1
 q2 = m*n + n + 2
 q3 = m*n + n
 q4 = m*n + n + 3
-p = m + n #dokimastiki timi
+p = m*n + n #dokimastiki timi
 h = m -1  #dokimastiki timi
 jj_row = 2 #dokimastiki timi
 ptx = 85
@@ -46,9 +46,9 @@ g1 = np.block(
     g0
 )
 print(g1)
-a0 = np.empty((q,1), float)
+a00 = np.empty((q,1), float)
 for i in range(q):
-    a0[i][0] = g1[0][i]
+    a00[i][0] = g1[0][i]
 
 A0=[]
 row1 =[]
@@ -56,7 +56,7 @@ row2 = []
 row3 = []
 fini = []
 row1.append(C1)
-row1.append(a0)
+row1.append(a00)
 row1.append(a1)
 fini.append(row1)
 row2.append(g1)
@@ -426,3 +426,5 @@ for j in range(n):
     Jj_ol.append(Jj)
 #     print("edw einai o Jj", Jj)
 # print("edw einai o Jj", Jj_ol[2])
+
+print("B0 size", len(B00))
