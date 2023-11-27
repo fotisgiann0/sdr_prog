@@ -623,10 +623,12 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
         L = np.trace(B20 @ Y)
         A = np.trace(B40 @ Y)
         if L < 0 and A == 0 and all([np.trace(Jj_ol[i] @ Y) == 1 for i in range(n)]) and all ([np.trace(Hh_ol[i] @ Y) <= 0 for i in range(m)]) and all ([np.trace(Gp_ol[i] @ Y) == 0 for i in range(p)]):
-            candidate = np.trace(B00 @ Y)
+            #candidate = np.trace(B00 @ Y)
+            candidate = calc_r0(pert)
             if candidate < minimum_obj:
                 minimum_obj= candidate
-                solution = pert 
+                solution = pert
+                optimal_freq = candidate
                 iteration_best = l
                 # for iter in range(n):
                 #     if pert[iter][0] != 0:
@@ -646,13 +648,14 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     # print ("minimum objective ", minimum_obj)  
     print ("pert ", pert)
     print ("solution array", solution)   
+    print ("optimal freq", optimal_freq)
     sdr_solution = solution[0][:-1]
     print ("solution ", sdr_solution)
 
     # compute best L and A
     # print ("Lbest: ", Lbest)
     # print  ("Amax: ", Amax)
-    return sdr_solution, Lbest, Amax
+    return sdr_solution, optimal_freq, Amax
 
 def random_offloading(B0,B1,B2,B3,B4):
     condition = True
