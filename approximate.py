@@ -35,10 +35,10 @@ prx = 1.181
 le = 0.5
 lt = 1 - le
 L = 100
-rmin = 200 * (10^6)
-rmax = 800 * (10^6)
+rmin = 200 #* (10**6)
+rmax = 800 #* (10**6)
 m_elliniko = 10
-p_elliniko = 1.25 * (10^(-26))
+p_elliniko = 1.25 * (10**(-26))
 z_elliniko = 3
 Ck_ul = np.random.uniform(10,20,size=(m,))
 Ck_dl = np.random.uniform(10,20,size=(m,))
@@ -111,11 +111,11 @@ def calc_r0(pert):
     sum1 = 0
     sum2 = 0
     for i in range(n):
-        sum1 += pert[i][0] * w[0][i]
+        sum1 += pert[0][i] * w[0][i]
     for i in range(n):
-        sum2 += pert[i][0] * Dk[0][i]
+        sum2 += pert[0][i] * Dk[i][0]
     ru = sum1 / sum2
-    rl = (lt / (2 * le * p_elliniko)) ^ (1/3)
+    rl = (lt / (2 * le * p_elliniko)) ** (1/3)
     #r3 , r4 = calculate_cost(pert)
     # if ru < rmin:
     #     r0 = rmin
@@ -577,7 +577,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     # constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1
     # constraints += [ X>= 0]    
 
-    prob = cp.Problem(cp.Minimize(1/n*cp.trace(B00 @ X)),
+    prob = cp.Problem(cp.Minimize(cp.trace(B00 @ X)),
                     constraints)
     # prob.solve(solver="MOSEK", verbose=True)
     # prob.solve(solver="SCS")
@@ -620,32 +620,32 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
         pert = np.append(pert,1)
         pert = np.array([pert])
         Y = np.transpose(pert)*pert
-        L = np.trace(B20 @ Y)
+        # L = np.trace(B20 @ Y)
         A = np.trace(B40 @ Y)
-        if L < 0 and A == 0 and all([np.trace(Jj_ol[i] @ Y) == 1 for i in range(n)]) and all ([np.trace(Hh_ol[i] @ Y) <= 0 for i in range(m)]) and all ([np.trace(Gp_ol[i] @ Y) == 0 for i in range(p)]):
+        # if L < 0 and A == 0 and all([np.trace(Jj_ol[i] @ Y) == 1 for i in range(n)]) and all ([np.trace(Hh_ol[i] @ Y) <= 0 for i in range(m)]) and all ([np.trace(Gp_ol[i] @ Y) == 0 for i in range(p)]):
             #candidate = np.trace(B00 @ Y)
-            candidate = calc_r0(pert)
-            if candidate < minimum_obj:
-                minimum_obj= candidate
-                solution = pert
-                optimal_freq = candidate
-                iteration_best = l
-                # for iter in range(n):
-                #     if pert[iter][0] != 0:
-                #         ro = calc_r0(pert)
-                #     else:
-                #         ro = (rmin + rmax) / 2
-                Lbest = L/n
-                Amax= -A/n
-        # else: 
+        candidate = calc_r0(pert)
+        if candidate < minimum_obj:
+            minimum_obj= candidate
+            solution = pert
+            optimal_freq = candidate
+            iteration_best = l
+            # for iter in range(n):
+            #     if pert[iter][0] != 0:
+            #         ro = calc_r0(pert)
+            #     else:
+            #         ro = (rmin + rmax) / 2
+            Lbest = L/n
+            Amax= -A/n
+    # else: 
         #     candidate = 1/n*np.trace(B0 @ Y)
         #     if candidate< minimum_obj:
         #         print ("ring the bell")
         #         print ("solution ", candidate)
         #         print ("solution ", pert)
 
-    # print ("iteration number to find optimal SDR solution: ", iteration_best)
-    # print ("minimum objective ", minimum_obj)  
+    print ("iteration number to find optimal SDR solution: ", iteration_best)
+    print ("minimum objective ", minimum_obj)  
     print ("pert ", pert)
     print ("solution array", solution)   
     print ("optimal freq", optimal_freq)
@@ -747,19 +747,19 @@ def calculate_cost(solution, r):
     solution = pert 
     ecomp = 0
     for i in range(n):
-        sum1 = p_elliniko * (r^z_elliniko) * pert[i][0] * Dk[i][0]
+        sum1 = p_elliniko * (r**z_elliniko) * pert[0][i] * Dk[i][0]
         ecomp = ecomp + sum1
     etr = 0
     for j in range(1,m):
         sum2 = 0
         for i in range(n):
-            sum2 = sum2 + (ptx  * pert[i][j] * dul[i][j]) + (prx  * pert[i][j] * ddl[i][j])
+            sum2 = sum2 + (ptx  * pert[0][j] * dul[i][j]) + (prx  * pert[0][j] * ddl[i][j])
         etr = etr + sum2 
     maxtk = 0
     for j in range(m):
         sum3 = 0
         for i in range(n):
-            sum3 = sum3 + pert[i][j]*Dk[i][j] 
+            sum3 = sum3 + pert[0][j]*Dk[i][j] 
         if(sum3 > maxtk):
             maxtk = sum3
     e_syn = ecomp + etr
@@ -777,7 +777,7 @@ def main():
     r1 = 1
     prev_sol = sdr_solution
     B0,B1,B2,B3,B4,B5,B6 = initilization(slist)
-    sdr_solution, Lbest, Amax = sdr_offloading(B0,B1,B2,B3,B4,B5,B6) 
+    sdr_solution, r_opt, Amax = sdr_offloading(B0,B1,B2,B3,B4,B5,B6) 
     # while (True):
     #     # print ("\n new iteration number: ", counter)
     #     prev_sol = sdr_solution
@@ -800,9 +800,9 @@ def main():
     #     # Acurrent = Amax
     #     counter +=1
     #     break;
-    total_cost, Lfinal,Afinal = calculate_cost(sdr_solution,r1)
+    total_cost, r_costing = calculate_cost(sdr_solution,r1)
     print (total_cost)
-    print (Lfinal,Afinal)
+    print (r_costing)
     return 
 
 if __name__ == "__main__":
