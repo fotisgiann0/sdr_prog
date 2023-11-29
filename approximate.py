@@ -621,7 +621,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
         pert = np.array([pert])
         Y = np.transpose(pert)*pert
         # L = np.trace(B20 @ Y)
-        A = np.trace(B40 @ Y)
+        #A = np.trace(B40 @ Y)
         # if L < 0 and A == 0 and all([np.trace(Jj_ol[i] @ Y) == 1 for i in range(n)]) and all ([np.trace(Hh_ol[i] @ Y) <= 0 for i in range(m)]) and all ([np.trace(Gp_ol[i] @ Y) == 0 for i in range(p)]):
             #candidate = np.trace(B00 @ Y)
         candidate = calc_r0(pert)
@@ -635,8 +635,8 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
             #         ro = calc_r0(pert)
             #     else:
             #         ro = (rmin + rmax) / 2
-            Lbest = L/n
-            Amax= -A/n
+            #Lbest = L/n
+            #Amax= -A/n
     # else: 
         #     candidate = 1/n*np.trace(B0 @ Y)
         #     if candidate< minimum_obj:
@@ -655,7 +655,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     # compute best L and A
     # print ("Lbest: ", Lbest)
     # print  ("Amax: ", Amax)
-    return sdr_solution, optimal_freq, Amax
+    return sdr_solution, optimal_freq
 
 def random_offloading(B0,B1,B2,B3,B4):
     condition = True
@@ -763,9 +763,9 @@ def calculate_cost(solution, r):
         if(sum3 > maxtk):
             maxtk = sum3
     e_syn = ecomp + etr
-    total_cost = lt * maxtk + le * e_syn  # + operator because A is negative here due to B2 matrix
+    total_cost = lt * maxtk + le * e_syn  
     # print (total_cost)
-    return total_cost, r
+    return total_cost
 
 def main():
     sdr_solution = [0]
@@ -774,10 +774,9 @@ def main():
     Acurrent = -10000000
     epsilon = 0.01
     counter = 0 
-    r1 = 1
     prev_sol = sdr_solution
     B0,B1,B2,B3,B4,B5,B6 = initilization(slist)
-    sdr_solution, r_opt, Amax = sdr_offloading(B0,B1,B2,B3,B4,B5,B6) 
+    sdr_solution, r_opt = sdr_offloading(B0,B1,B2,B3,B4,B5,B6) 
     # while (True):
     #     # print ("\n new iteration number: ", counter)
     #     prev_sol = sdr_solution
@@ -800,9 +799,8 @@ def main():
     #     # Acurrent = Amax
     #     counter +=1
     #     break;
-    total_cost, r_costing = calculate_cost(sdr_solution,r1)
+    total_cost = calculate_cost(sdr_solution,r_opt)
     print (total_cost)
-    print (r_costing)
     return 
 
 if __name__ == "__main__":
