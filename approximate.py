@@ -108,34 +108,41 @@ def diag_up(sp):
     return up
 
 def calc_r0(pert):
-    sum1 = 0
-    sum2 = 0
+    sum1 = 0.0
+    sum2 = 0.0
     for i in range(n):
         sum1 += pert[0][i] * w[0][i]
     for i in range(n):
         sum2 += pert[0][i] * Dk[i][0]
+    # print("sum1", sum1, type(sum1))
+    # print("sum2", sum2, type(sum2))
     ru = sum1 / sum2
     rl = (lt / (2 * le * p_elliniko)) ** (1/3)
-    #r3 , r4 = calculate_cost(pert)
-    # if ru < rmin:
-    #     r0 = rmin
-    # elif ru >= rmin & ru <= rmax:
-    #     if(rl < rmin):
-    #         r0 = calculate_cost
-    #     elif rl >= rmin  & rl <= rmax:
-    #         r0 = np.argmin(pert)
-    #     else:
-    #         r0 = ru
-    # else:
-    #     if(rl < rmin):
-    #         r0 = rmin
-    #     elif rl >= rmin  & rl <= rmax:
-    #         r0 = rl
-    #     else:
-    #         r0 = rmax
-    r0 = ru
+    if ru < rmin:
+        r0 = rmin
+    elif (ru >= rmin) & (ru <= rmax):
+        if(rl < rmin):
+            r0 = minim_r0(pert, ru, rmin)
+        elif (rl >= rmin)  & (rl <= rmax):
+            r0 = minim_r0(pert, ru, rl)
+        else:
+            r0 = ru
+    else:
+        if(rl < rmin):
+            r0 = rmin
+        elif (rl >= rmin)  & (rl <= rmax):
+            r0 = rl
+        else:
+            r0 = rmax
+    #r0 = ru
     return r0
 
+def minim_r0(pert, r3, r4):
+    if calculate_cost(pert, r3) < calculate_cost(pert, r4):
+        return r3
+    else:
+        return r4
+ 
 def initilization(s):
     C1 = np.zeros([q,q])
     a1 = np.zeros([q,1])
