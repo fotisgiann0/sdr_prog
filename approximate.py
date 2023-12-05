@@ -607,7 +607,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     Xstar = Xstar[:-4,:-4]
     print(len(Xstar))
     minimum_obj = 10000000000000 
-    solution=[0,1,1]
+    solution=[]
     for l in range (iterations):
         ksi = np.random.multivariate_normal(np.zeros(p), Xstar,   tol=1e-6) #isws add size =100 arguement
         # print (ksi)
