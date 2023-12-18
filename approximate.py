@@ -7,7 +7,7 @@ from math import exp, log
 
 ###################### basic settings
 m = 3
-n = 10
+n = 4
 p = n*m + n 
 q = m*n + n + 1
 q2 = m*n + n + 2
@@ -110,6 +110,12 @@ def diag_up(sp):
 def calc_r0(pert):
     sum1 = 0.0
     sum2 = 0.0
+    check_zero = 0
+    for i in range(n):
+        if (pert[0][i] != 0):
+            check_zero = 1
+    if(check_zero == 0):
+        return rmin
     for i in range(n):
         sum1 += pert[0][i] * w[0][i]
     for i in range(n):
