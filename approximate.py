@@ -7,7 +7,7 @@ from math import exp, log
 
 ###################### basic settings
 m = 3
-n = 4
+n = 4  #kanonika 10
 p = n*m + n 
 q = m*n + n + 1
 q2 = m*n + n + 2
@@ -38,7 +38,7 @@ L = 100
 rmin = 200 #* (10**6)
 rmax = 800 #* (10**6)
 m_elliniko = 10
-p_elliniko = 1.25 * (10**(-26))
+p_elliniko = 1.25 * (10**(-16))  #-26 kanonika
 z_elliniko = 3
 Ck_ul = np.random.uniform(10,20,size=(m,))
 Ck_dl = np.random.uniform(10,20,size=(m,))
@@ -596,13 +596,13 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     # prob.solve(solver="SCS")
     # prob.solve(solver="MOSEK")
     # prob.solve(solver="GUROBI",verbose=True)
-    prob.solve(solver="SCS")
+    prob.solve(solver="SCS", verbose=True)
     # Print result.
     # print("The SDR optimal value is", prob.value)
-    print("A solution X is")
+    #print("A solution X is")
     # np.set_printoptions(precision=3)
 
-    print (X.value.any() > 0 and X.value.any() < 1)
+    #print (X.value.any() > 0 and X.value.any() < 1)
     # rank = np.linalg.matrix_rank(X.value)
     # print ("Rank of SDR solution is: ", rank)
     # return X.value
@@ -611,7 +611,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     iteration_best = -1
     Xstar = X.value
     Xstar = Xstar[:-4,:-4]
-    print(len(Xstar))
+    #print(len(Xstar))
     minimum_obj = 10000000000000 
     solution=[]
     for l in range (iterations):
