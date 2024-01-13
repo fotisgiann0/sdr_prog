@@ -598,7 +598,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     # prob.solve(solver="GUROBI",verbose=True)
     prob.solve(solver="SCS", verbose=True)
     # Print result.
-    # print("The SDR optimal value is", prob.value)
+    print("The SDR optimal value is", prob.value)
     #print("A solution X is")
     # np.set_printoptions(precision=3)
 
@@ -610,6 +610,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     ############# mapping to feasible solution 
     iteration_best = -1
     Xstar = X.value
+    print("Xstar is ", Xstar)
     Xstar = Xstar[:-4,:-4]
     #print(len(Xstar))
     minimum_obj = 10000000000000 
