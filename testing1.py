@@ -1,8 +1,8 @@
 import numpy as np
 
 ksiedge = 4
-m = 3
-n = 10
+m = 4 # 3 + 1
+n = 4 #kanonika 10
 q = m*n + n + 1
 q2 = m*n + n + 2
 q3 = m*n + n
@@ -12,9 +12,9 @@ h = m -1  #dokimastiki timi
 jj_row = 2 #dokimastiki timi
 ptx = 85
 prx = 99
-le = 7
-lt = 8
-
+le = 0.5
+lt = 0.5
+#lt = 1 - le
 
 
 C1 = np.zeros([q,q])
@@ -31,11 +31,19 @@ aq2 = np.zeros([q2,q2])
 
 # gia ton A0 
 
-
+ai = np.empty((n), float)
+for i in range(n):
+    ai[i] = 0.5
 w = np.empty((1,n), float)
 for i in range(n):
-    w[0][i] = i
-print(w)
+    w[0][i] = 330 * ai[i]
+
+Ck_ul = np.random.uniform(10,20,size=(m,))
+Ck_dl = np.random.uniform(10,20,size=(m,))
+# w = np.empty((1,n), float)
+# for i in range(n):
+#     w[0][i] = i
+# print(w)
 
 #li = a0, g1 einai o adj tou a0
 

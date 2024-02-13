@@ -42,9 +42,9 @@ p_elliniko = 1.25 * (10**(-16))  #-26 kanonika
 z_elliniko = 3
 Ck_ul = np.random.uniform(10,20,size=(m,))
 Ck_dl = np.random.uniform(10,20,size=(m,))
-ai = np.empty((n), float)
+ai = np.empty((n), float) #make 0.1 0.2 ...
 for i in range(n):
-    ai[i] = 0.5
+    ai[i] = 0.1 + n*0.1
 w = np.empty((1,n), float)
 for i in range(n):
     w[0][i] = 330 * ai[i]
