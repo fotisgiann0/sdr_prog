@@ -35,8 +35,9 @@ prx = 1.181
 le = 0.5
 lt = 1 - le
 L = 100
-rmin = 200 #* (10**6)
-rmax = 800 #* (10**6)
+s_elliniko = 150 
+rmin = (400-s_elliniko) * (10**6) 
+rmax = (400+s_elliniko) * (10**6)
 m_elliniko = 10
 p_elliniko = 1.25 * (10**(-16))  #-26 kanonika
 z_elliniko = 3
@@ -44,7 +45,7 @@ Ck_ul = np.random.uniform(10,20,size=(m,))
 Ck_dl = np.random.uniform(10,20,size=(m,))
 ai = np.empty((n), float) #make 0.1 0.2 ...
 for i in range(n):
-    ai[i] = 0.1 + n*0.1
+    ai[i] = (0.1 + n*0.1) * (10**6)
 w = np.empty((1,n), float)
 for i in range(n):
     w[0][i] = 330 * ai[i]
@@ -52,9 +53,11 @@ bi = np.empty((n), float)
 for i in range(n):
     bi[i] = 0.2 * ai[i]
 r_k = np.empty((m), float)
-r_k[0] = 1
-r_k[1] = 2
-r_k[2] = 2.2
+for i in range(m):
+    r_k[i] = 2 * (10**9)
+# r_k[0] = 1
+# r_k[1] = 2
+# r_k[2] = 2.2
 dul = np.empty((n,m), float)
 ddl = np.empty((n,m), float)
 Dk = np.empty((n,m), float)
