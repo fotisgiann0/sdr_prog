@@ -45,10 +45,12 @@ Ck_ul = np.random.uniform(10,20,size=(m,))
 Ck_dl = np.random.uniform(10,20,size=(m,))
 ai = np.empty((n), float) #make 0.1 0.2 ...
 for i in range(n):
-    ai[i] = (0.1 + n*0.1) * (10**6)
+    ai[i] = (0.1 + i*0.1) * (10**6)
+#print("this is ai", ai)
 w = np.empty((1,n), float)
 for i in range(n):
     w[0][i] = 330 * ai[i]
+#print("this is w", w)
 bi = np.empty((n), float)
 for i in range(n):
     bi[i] = 0.2 * ai[i]
@@ -171,7 +173,7 @@ def initilization(s):
     a0 = np.empty((q,1), float)
     for i in range(q):
         a0[i][0] = g1[0][i]
-
+    #print("this is a0", a0)
     A0=[]
     row1 =[]
     row2 = []
@@ -191,7 +193,7 @@ def initilization(s):
     A0 = np.block(
         fini
     )
-    #print(A0)
+    #print("this is A0" , len(A0)) looks good
     # a2 einai o a2, g3 einai o adj tou a2
     g2 = []
     g2.append(np.zeros([1,q2 - 2]))
@@ -205,7 +207,7 @@ def initilization(s):
     for i in range(q2):
         a2[i][0] = g3[0][i]
     #print(a2)
-
+    #print("this is a2", a2)
     #b2 einai o b2, g5 einai o adj tou b2
     g4 =[]
     g4.append(w)
@@ -216,7 +218,7 @@ def initilization(s):
     b2 = np.empty((q2+1,1), float)
     for i in range(q2+1):
         b2[i][0] = g5[0][i]
-    #print(b2)
+    #print("this is b2", b2 ) looks good
 
     A2 = []
     a21 =[]
@@ -231,7 +233,7 @@ def initilization(s):
     A2 = np.block(
         a21
     )
-    #print(A2)
+    #print("this is A2", A2) looks good
 
 
     a31 = []
@@ -241,7 +243,7 @@ def initilization(s):
     A3 = np.block(
         a31
     )
-    #print(A3)
+    #print( A3) looks good
 
     ro1 = []
     ro2 = []
@@ -263,7 +265,7 @@ def initilization(s):
     A4 = np.block(
         a41
     )
-    #print(A4)
+    #print(A4) looks good
 
     #k4 einai o adj tou b4
     b41 = []
@@ -277,7 +279,7 @@ def initilization(s):
     b4 = np.empty((q+2,1), float)
     for i in range(q+2):
         b4[i][0] = k4[0][i]
-    #print(b4)
+    #print(len(b4)) looks good
 
 
 
@@ -292,8 +294,8 @@ def initilization(s):
     b5 = np.empty((q3+3,1), float)
     for i in range(q3+3):
         b5[i][0] = k5[0][i]
-    #print(b5)
-
+    #print(b5) looks good
+    #EDW EIXA MEINEI STO TESTING
     #edw 3ekinaei to ktisimo tou b0',o opios  einai o pt3
     pt1 = []
     pt2 = []
