@@ -7,7 +7,7 @@ from math import exp, log
 
 ###################### basic settings
 m = 3
-n = 4  #kanonika 10
+n = 10  #kanonika 10
 p = n*m + n 
 q = m*n + n + 1
 q2 = m*n + n + 2
@@ -39,13 +39,13 @@ s_elliniko = 150
 rmin = (400-s_elliniko) * (10**6) 
 rmax = (400+s_elliniko) * (10**6)
 m_elliniko = 10
-p_elliniko = 1.25 * (10**(-16))  #-26 kanonika
+p_elliniko = 1.25 * (10**(-26))  #-26 kanonika
 z_elliniko = 3
-Ck_ul = np.random.uniform(10,20,size=(m,))
-Ck_dl = np.random.uniform(10,20,size=(m,))
+Ck_ul = np.random.uniform(10,20,size=(m,))  #allages edw
+Ck_dl = np.random.uniform(10,20,size=(m,))  #kai edw
 ai = np.empty((n), float) #make 0.1 0.2 ...
 for i in range(n):
-    ai[i] = (0.1 + i*0.1) * (10**6)
+    ai[i] =  0.5 * (10**6) #(0.1 + i*0.1) * (10**6)
 #print("this is ai", ai)
 w = np.empty((1,n), float)
 for i in range(n):
@@ -57,17 +57,17 @@ for i in range(n):
 r_k = np.empty((m), float)
 for i in range(m):
     r_k[i] = 2 * (10**9)
-# r_k[0] = 1
-# r_k[1] = 2
-# r_k[2] = 2.2
+r_k[0] = 400 * (10**6)
+r_k[1] = 2 * (10**9)
+r_k[2] = 2.2 * (10**9)
 dul = np.empty((n,m), float)
 ddl = np.empty((n,m), float)
 Dk = np.empty((n,m), float)
-
+#check this loop
 for i in range(n):
     for j in range(m):
-        dul[i][j] = ai[i] / Ck_ul[j]
-        ddl[i][j] = bi[i] / Ck_dl[j]
+        dul[i][j] = ai[i] / (Ck_ul[j] * (10**6))
+        ddl[i][j] = bi[i] / (Ck_dl[j] * (10**6))
         Dk[i][j] = dul[i][j] + ddl[i][j] + (w[0][i] / r_k[j])
 
 
@@ -162,7 +162,7 @@ def initilization(s):
     a5 = np.zeros([1,2])
     #a6 = np.zeros([2,2])
     aq2 = np.zeros([q2,q2])
-
+    print("this is ckul" ,Ck_ul)
     g0 = []
     g0.append(w)
     g0.append(np.zeros([1,q - n]))
