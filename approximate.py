@@ -6,7 +6,7 @@ import random
 from math import exp, log
 
 ###################### basic settings
-m = 3
+m = 2
 n = 10  #kanonika 10
 p = n*m + n 
 q = m*n + n + 1
@@ -54,12 +54,12 @@ for i in range(n):
 bi = np.empty((n), float)
 for i in range(n):
     bi[i] = 0.2 * ai[i]
-r_k = np.empty((m), float)
-for i in range(m):
+r_k = np.empty((m+1), float)
+for i in range(m+1):
     r_k[i] = 2 * (10**9)
-r_k[0] = 400 * (10**6)
+r_k[0] = 2.2 * (10**9)#400 * (10**6)
 r_k[1] = 2 * (10**9)
-r_k[2] = 2.2 * (10**9)
+r_k[2] = 400 * (10**6)#2.2 * (10**9)
 dul = np.empty((n,m), float)
 ddl = np.empty((n,m), float)
 Dk = np.empty((n,m), float)
@@ -69,7 +69,10 @@ for i in range(n):
         dul[i][j] = ai[i] / (Ck_ul[j] * (10**6))
         ddl[i][j] = bi[i] / (Ck_dl[j] * (10**6))
         Dk[i][j] = dul[i][j] + ddl[i][j] + (w[0][i] / r_k[j])
-
+print(dul)
+print(ddl)
+print(Dk)
+print(w[0][2] / r_k[1])
 
 #################### functions
 def gompertz_local (s, remote): # remote == True for edge gompertz function. 
@@ -154,7 +157,7 @@ def minim_r0(pert, r3, r4):
     else:
         return r4
  
-def initilization(s):
+def initilization():
     C1 = np.zeros([q,q])
     a1 = np.zeros([q,1])
     a3 = np.zeros([1,q])
@@ -342,7 +345,7 @@ def initilization(s):
         A111.append(np.zeros([1,n]))
         for j in range(i):
             A111.append(np.zeros([1,n]))
-        A111.append(Dk[i])
+        A111.append(Dk[ :, i])
         for coun in range(m-i):
             A111.append(np.zeros([1,n]))
         A111.append(0)
@@ -595,7 +598,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     # constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1
     # constraints += [ X>= 0]    
 
-    prob = cp.Problem(cp.Minimize(cp.trace(B00 @ X)),
+    prob = cp.Problem(cp.Minimize(1/n*cp.trace(B00 @ X)),
                     constraints)
     # prob.solve(solver="MOSEK", verbose=True)
     # prob.solve(solver="SCS")
@@ -794,7 +797,7 @@ def main():
     epsilon = 0.01
     counter = 0 
     prev_sol = sdr_solution
-    B0,B1,B2,B3,B4,B5,B6 = initilization(slist)
+    B0,B1,B2,B3,B4,B5,B6 = initilization()
     sdr_solution, r_opt = sdr_offloading(B0,B1,B2,B3,B4,B5,B6) 
     # while (True):
     #     # print ("\n new iteration number: ", counter)
