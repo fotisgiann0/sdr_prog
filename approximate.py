@@ -7,7 +7,7 @@ from math import exp, log
 
 ###################### basic settings
 m = 2
-n = 10  #kanonika 10
+n = 4  #kanonika 10
 p = n*m + n 
 q = m*n + n + 1
 q2 = m*n + n + 2
@@ -41,11 +41,13 @@ rmax = (400+s_elliniko) * (10**6)
 m_elliniko = 10
 p_elliniko = 1.25 * (10**(-26))  #-26 kanonika
 z_elliniko = 3
-Ck_ul = np.random.uniform(10,20,size=(m,))  #allages edw
-Ck_dl = np.random.uniform(10,20,size=(m,))  #kai edw
+Ck_ul = np.random.uniform(10,20,size=(m+1,))  #allages edw
+Ck_dl = np.random.uniform(10,20,size=(m+1,))  #kai edw
+Ck_ul[0] = 100000
+Ck_dl[0] = 100000
 ai = np.empty((n), float) #make 0.1 0.2 ...
 for i in range(n):
-    ai[i] =  0.5 * (10**6) #(0.1 + i*0.1) * (10**6)
+    ai[i] =  (0.1 + i*0.1) * (10**6)
 #print("this is ai", ai)
 w = np.empty((1,n), float)
 for i in range(n):
@@ -57,15 +59,15 @@ for i in range(n):
 r_k = np.empty((m+1), float)
 for i in range(m+1):
     r_k[i] = 2 * (10**9)
-r_k[0] = 2.2 * (10**9)#400 * (10**6)
+r_k[0] = 400 * (10**6)
 r_k[1] = 2 * (10**9)
-r_k[2] = 400 * (10**6)#2.2 * (10**9)
-dul = np.empty((n,m), float)
-ddl = np.empty((n,m), float)
-Dk = np.empty((n,m), float)
-#check this loop
+r_k[2] = 2.2 * (10**9)
+dul = np.empty((n,m+1), float)
+ddl = np.empty((n,m+1), float)
+Dk = np.empty((n,m+1), float)
+#ZEROING THE M = 0 stuff, change ckul ckdl(den xreiazetai aparaitita)
 for i in range(n):
-    for j in range(m):
+    for j in range(m+1):
         dul[i][j] = ai[i] / (Ck_ul[j] * (10**6))
         ddl[i][j] = bi[i] / (Ck_dl[j] * (10**6))
         Dk[i][j] = dul[i][j] + ddl[i][j] + (w[0][i] / r_k[j])
@@ -303,7 +305,7 @@ def initilization():
     pt1 = []
     pt2 = []
 
-    for i in range(m):
+    for i in range(1, m+1):
         for j in range(n):
             pt1.append(ptx * dul[j][i])
             pt2.append(prx * ddl[j][i])
@@ -335,7 +337,7 @@ def initilization():
     b0[n+n*m + 1] = 0
     b0[n+n*m + 2] = lt 
 
-    #print("edw einai o b0", b0)
+    print("edw einai o b0", b0)
 
     #gia ton A1
     A111 = []
@@ -386,7 +388,7 @@ def initilization():
     B00 = np.block(
         final_array
     )
-    #print("edw eibai o B0", B00)
+    print("edw eibai o B0", B00[ :, q+2])
 
 
     #b2 einai o b2, g5 einai o adj tou b2
