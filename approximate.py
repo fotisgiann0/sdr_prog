@@ -597,8 +597,9 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     constraints += [cp.trace(Jj_ol[i] @ X) == 1 for i in range(n)]
     constraints += [cp.trace(Hh_ol[i] @ X) <= 0 for i in range(m)]
     constraints += [cp.trace(Gp_ol[i] @ X) == 0 for i in range(p)]
-    # constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1
-    # constraints += [ X>= 0]    
+    constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1
+    constraints += [ X>= 0]    
+    constraints += [ X[q4][q4] == 1] 
 
     prob = cp.Problem(cp.Minimize(1/n*cp.trace(B00 @ X)),
                     constraints)
