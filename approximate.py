@@ -36,18 +36,18 @@ le = 0.5
 lt = 1 - le
 L = 100
 s_elliniko = 150 
-rmin = (400-s_elliniko) #* (10**6) 
-rmax = (400+s_elliniko) #* (10**6)
+rmin = 400 #(400-s_elliniko) #* (10**6) 
+rmax = 800 #(400+s_elliniko) #* (10**6)
 m_elliniko = 10
 p_elliniko = 1.25 * (10**(-26))  #-26 kanonika
 z_elliniko = 3
-Ck_ul = [15, 15, 15]#np.random.uniform(10,20,size=(m+1,))  #allages edw
-Ck_dl = [15, 15, 15]#np.random.uniform(10,20,size=(m+1,))  #kai edw
+Ck_ul = [5, 7, 6]#np.random.uniform(10,20,size=(m+1,))  #allages edw
+Ck_dl = [6, 5, 7]#np.random.uniform(10,20,size=(m+1,))  #kai edw
 # Ck_ul[0] = 100000
 # Ck_dl[0] = 100000
 ai = np.empty((n), float) #make 0.1 0.2 ...
 for i in range(n):
-    ai[i] =  0.1 + i*0.1 #(0.1 + i*0.1) * (10**6)
+    ai[i] =  0.5 #(0.1 + i*0.1) #* (10**3) #(0.1 + i*0.1) * (10**6)
 #print("this is ai", ai)
 w = np.empty((1,n), float)
 for i in range(n):
@@ -599,11 +599,11 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     constraints += [cp.trace(B40 @ X) == 0]
     constraints += [cp.trace(B20 @ X) <= 0]
     constraints += [cp.trace(B50 @ X) <= rmax]
-    constraints += [cp.trace(B50 @ X) >= rmin]
+    constraints += [cp.trace(B50 @ X) >= -rmin]  #infeasable edw problem here
     constraints += [cp.trace(Jj_ol[i] @ X) == 1 for i in range(n)]
     constraints += [cp.trace(Hh_ol[i] @ X) <= 0 for i in range(m)]
-    constraints += [cp.trace(Gp_ol[i] @ X) == 0 for i in range(p)]
-    constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1
+    #constraints += [cp.trace(Gp_ol[i] @ X) == 0 for i in range(p)]  #inacurate edw
+    #constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1  #infeasable edw
     constraints += [ X>= 0]    
     constraints += [ X[q4][q4] == 1] 
 
