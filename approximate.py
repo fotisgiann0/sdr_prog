@@ -7,7 +7,7 @@ from math import exp, log
 
 ###################### basic settings
 m = 2
-n = 4  #kanonika 10
+n = 10  #kanonika 10
 p = n*m + n 
 q = m*n + n + 1
 q2 = m*n + n + 2
@@ -36,8 +36,8 @@ le = 0.5
 lt = 1 - le
 L = 100
 s_elliniko = 150 
-rmin = 400 #(400-s_elliniko) #* (10**6) 
-rmax = 800 #(400+s_elliniko) #* (10**6)
+rmin = 150 #(400-s_elliniko) #* (10**6) 
+rmax = 550 #(400+s_elliniko) #* (10**6)
 m_elliniko = 10
 p_elliniko = 1.25 * (10**(-26))  #-26 kanonika
 z_elliniko = 3
@@ -47,7 +47,7 @@ Ck_dl = [6, 5, 7]#np.random.uniform(10,20,size=(m+1,))  #kai edw
 # Ck_dl[0] = 100000
 ai = np.empty((n), float) #make 0.1 0.2 ...
 for i in range(n):
-    ai[i] =  0.5 #(0.1 + i*0.1) #* (10**3) #(0.1 + i*0.1) * (10**6)
+    ai[i] =  (0.1 + i*0.1) #* (10**3) #(0.1 + i*0.1) * (10**6)
 #print("this is ai", ai)
 w = np.empty((1,n), float)
 for i in range(n):
@@ -61,7 +61,7 @@ for i in range(m+1):
     r_k[i] = 0 #2 * (10**9)
 r_k[0] = 400 #400 * (10**6)
 r_k[1] = 2000#2 * (10**9)
-r_k[2] = 2200#2.2 * (10**9)
+r_k[2] = 2000#2.2 * (10**9)
 dul = np.empty((n,m+1), float)
 ddl = np.empty((n,m+1), float)
 Dk = np.empty((n,m+1), float)
@@ -75,10 +75,10 @@ for i in range(n):
             dul[i][j] = ai[i] / Ck_ul[j] #(Ck_ul[j] * (10**6))
             ddl[i][j] = bi[i] / Ck_dl[j] #(Ck_dl[j] * (10**6))
         Dk[i][j] = dul[i][j] + ddl[i][j] + (w[0][i] / r_k[j])
-print(dul)
-print(ddl)
-print(Dk)
-print(w[0][2] / r_k[1])
+# print(dul)
+# print(ddl)
+# print(Dk)
+# print(w[0][2] / r_k[1])
 
 #################### functions
 def gompertz_local (s, remote): # remote == True for edge gompertz function. 
@@ -171,7 +171,7 @@ def initilization():
     a5 = np.zeros([1,2])
     #a6 = np.zeros([2,2])
     aq2 = np.zeros([q2,q2])
-    print("this is ckul" ,Ck_ul)
+    #print("this is ckul" ,Ck_ul)
     g0 = []
     g0.append(w)
     g0.append(np.zeros([1,q - n]))
@@ -202,7 +202,7 @@ def initilization():
     A0 = np.block(
         fini
     )
-    print("this is A0" , A0) #looks good
+    #print("this is A0" , A0) #looks good
     # a2 einai o a2, g3 einai o adj tou a2
     g2 = []
     g2.append(np.zeros([1,q2 - 2]))
@@ -341,7 +341,7 @@ def initilization():
     b0[n+n*m + 1] = 0
     b0[n+n*m + 2] = lt 
 
-    print("edw einai o b0", b0)
+    #print("edw einai o b0", b0)
 
     #gia ton A1
     A111 = []
@@ -385,16 +385,16 @@ def initilization():
 
     first_row.append(A0)
     first_row.append(0.5*b0)
-    print("firstr row", first_row)
+    #print("firstr row", first_row)
     final_array.append(first_row)
     second_row.append(0.5*b0t)
     second_row.append(0)
-    print("second row", second_row)
+    #print("second row", second_row)
     final_array.append(second_row)
     B00 = np.block(
         final_array
     )
-    print("edw eibai o B0", B00)
+    #print("edw eibai o B0", B00)
 
 
     #b2 einai o b2, g5 einai o adj tou b2
@@ -495,12 +495,12 @@ def initilization():
         )
         #print("edw einai o Hh", Hh)
         Hh_ol.append(Hh)
-    print("edw einai o Hh 1")
-    print( Hh_ol[0]) #, Hh_ol[0])
-    print("edw einai o Hh 2")#, Hh_ol[1])
-    print(Hh_ol[1])
-    print("A1")
-    print(A1)
+    # print("edw einai o Hh 1")
+    # print( Hh_ol[0]) #, Hh_ol[0])
+    # print("edw einai o Hh 2")#, Hh_ol[1])
+    # print(Hh_ol[1])
+    # print("A1")
+    # print(A1)
 
     #Jj
     Jj_ol = []
@@ -610,14 +610,14 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     constraints += [cp.trace(B20 @ X) <= 0]
     constraints += [cp.trace(B50 @ X) <= rmax]
     constraints += [cp.trace(B50 @ X) >= -rmin]  #infeasable edw problem here
-    constraints += [cp.trace(Jj_ol[i] @ X) == 1 for i in range(n)]
+    #constraints += [cp.trace(Jj_ol[i] @ X) == 1 for i in range(n)]
     constraints += [cp.trace(Hh_ol[i] @ X) <= 0 for i in range(m)]
     constraints += [cp.trace(Gp_ol[i] @ X) == 0 for i in range(p)]  #inacurate edw
-    constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1  #infeasable edw
+    #constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1  #infeasable edw
     constraints += [ X>= 0]    
     constraints += [ X[q4][q4] == 1] 
 
-    prob = cp.Problem(cp.Minimize(1/n*cp.trace(B00 @ X)),
+    prob = cp.Problem(cp.Minimize(cp.trace(B00 @ X)),
                     constraints)
     # prob.solve(solver="MOSEK", verbose=True)
     # prob.solve(solver="SCS")
@@ -637,7 +637,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     ############# mapping to feasible solution 
     iteration_best = -1
     Xstar = X.value
-    print("Xstar is ", Xstar)
+    #print("Xstar is ", Xstar)
     Xstar = Xstar[:-4,:-4]
     #print(len(Xstar))
     minimum_obj = 10000000000000 
