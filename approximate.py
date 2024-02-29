@@ -469,7 +469,10 @@ def initilization():
             final_array
         )
         Gp_ol.append(Gp)
-    # print("this is gp", Gp_ol[1], Gp_ol[1][0], Gp_ol[1][n*m + n + 3])
+    # print("this is gp 0", Gp_ol[0], Gp_ol[0][n*m+n+3], Gp_ol[0][:,n*m+n+3])
+    # print("this is gp 1", Gp_ol[1], Gp_ol[1][n*m+n+3], Gp_ol[1][:,n*m+n+3])
+    # print("this is gp last", Gp_ol[n*m+n-1], Gp_ol[n*m+n-1][n*m+n+3], Gp_ol[n*m+n-1][:,n*m+n+3])
+    # print("checking", Gp_ol[0][n*m+n+3][0] == -0.5 )
     # print("this is gp 0", Gp_ol[0], Gp_ol[0][0], Gp_ol[0][n*m + n + 3])
     Hh_ol = []
     for j in range(m):
@@ -497,6 +500,10 @@ def initilization():
         Hh_ol.append(Hh)
     # print("edw einai o Hh 1")
     # print( Hh_ol[0]) #, Hh_ol[0])
+    # print("Hh 0 q4" ,Hh_ol[0][q4]) #, Hh_ol[0])
+    # print("Hh 0 q4" ,Hh_ol[0][:,q4]) #, Hh_ol[0])
+    # print("Hh 1 q4" ,Hh_ol[1][q4]) #, Hh_ol[0])
+    # print("Hh 1 q4" ,Hh_ol[1][:,q4]) #, Hh_ol[0])
     # print("edw einai o Hh 2")#, Hh_ol[1])
     # print(Hh_ol[1])
     # print("A1")
@@ -527,9 +534,11 @@ def initilization():
             final_array
         )
         Jj_ol.append(Jj)
-    # print("this is jj 0", Jj_ol[0]) #, Jj_ol[1], Jj_ol[2])
-    # print("this is jj 1", Jj_ol[1])
-    # print("this is jj 2", Jj_ol[2])
+    # print("this is jj 0", Jj_ol[0][:,q4]) #, Jj_ol[1], Jj_ol[2])
+    # print("this is jj 1", Jj_ol[1][:,q4])
+    # print("this is jj 2", Jj_ol[2][:,q4])
+    # print("this is jj n-1", Jj_ol[n-1][q4]) #[ :, i]
+    # print("this is jj n-1", Jj_ol[n-1][ :, q4]) #[ :, i]
    # print("this is jj", Jj_ol[0], Jj_ol[0][0], Jj_ol[0][n*m + n + 3])
     return B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol
 
@@ -610,7 +619,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     constraints += [cp.trace(B20 @ X) <= 0]
     constraints += [cp.trace(B50 @ X) <= rmax]
     constraints += [cp.trace(B50 @ X) >= -rmin]  #infeasable edw problem here
-    #constraints += [cp.trace(Jj_ol[i] @ X) == 1 for i in range(n)]
+    constraints += [cp.trace(Jj_ol[i] @ X) == 1 for i in range(n)]
     constraints += [cp.trace(Hh_ol[i] @ X) <= 0 for i in range(m)]
     constraints += [cp.trace(Gp_ol[i] @ X) == 0 for i in range(p)]  #inacurate edw
     #constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1  #infeasable edw
@@ -623,7 +632,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     # prob.solve(solver="SCS")
     # prob.solve(solver="MOSEK")
     # prob.solve(solver="GUROBI",verbose=True)
-    prob.solve(solver="SCS", verbose=True)
+    prob.solve(solver="SCS") #, verbose=True)
     # Print result.
     print("The SDR optimal value is", prob.value)
     #print("A solution X is")
