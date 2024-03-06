@@ -32,14 +32,14 @@ ksiedge = 0.06706
 alpha = 1 # change from 0.1 to 500 
 ptx = 1.285
 prx = 1.181
-le = 0.999
+le = 0.001
 lt = 1 - le
 L = 100
 s_elliniko = 150 
 rmin = 200#150 #(400-s_elliniko) #* (10**6) 
 rmax = 800#550 #(400+s_elliniko) #* (10**6)
 m_elliniko = 10
-p_elliniko = 1.25 * (10**(-26))  #-26 kanonika
+p_elliniko = 1.25 * (10**(-20))  #-26 kanonika
 z_elliniko = 3
 Ck_ul = [0.5, 0.6, 0.9]#np.random.uniform(10,20,size=(m+1,))  #allages edw
 Ck_dl = [0.7, 0.5, 1]#np.random.uniform(10,20,size=(m+1,))  #kai edw
@@ -132,8 +132,9 @@ def calc_r0(pert):
         return rmin
     for i in range(n):
         sum1 += pert[0][i] * w[0][i]
-    for i in range(n):
-        sum2 += pert[0][i] * Dk[i][0]
+    for j in range(1,m+1):
+        for i in range(n):
+            sum2 += pert[0][i+j*n] * Dk[i][j]
     # print("sum1", sum1, type(sum1))
     # print("sum2", sum2, type(sum2))
     ru = sum1 / sum2
@@ -143,7 +144,7 @@ def calc_r0(pert):
     elif (ru >= rmin) & (ru <= rmax):
         if(rl < rmin):
             r0 = minim_r0(pert, ru, rmin)
-        elif (rl >= rmin)  & (rl <= rmax):
+        elif (rl >= rmin)  & (rl <= ru):
             r0 = minim_r0(pert, ru, rl)
         else:
             r0 = ru
@@ -447,7 +448,8 @@ def initilization():
     B50 = np.block(
         final_array
     )
-    #print("edw einai o B5", B50)
+    # print("edw einai o B5 last row", B50[q4])
+    # print("edw einai o B5 last column", B50[:,q4])
 
     #Gp 
     Gp_ol = []
@@ -618,7 +620,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     constraints += [cp.trace(B40 @ X) == 0]
     constraints += [cp.trace(B20 @ X) <= 0]
     constraints += [cp.trace(B50 @ X) <= rmax]
-    constraints += [cp.trace(B50 @ X) >= -rmin]  #infeasable edw problem here
+    constraints += [cp.trace(B50 @ X) >= -rmin]  #infeasable problem here
     constraints += [cp.trace(Jj_ol[i] @ X) == 1 for i in range(n)] #inaccurate, optimal otan einai comment
     constraints += [cp.trace(Hh_ol[i] @ X) <= 0 for i in range(m)]
     constraints += [cp.trace(Gp_ol[i] @ X) == 0 for i in range(p)]  #inacurate edw
@@ -639,8 +641,8 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     # np.set_printoptions(precision=3)
 
     #print (X.value.any() > 0 and X.value.any() < 1)
-    # rank = np.linalg.matrix_rank(X.value)
-    # print ("Rank of SDR solution is: ", rank)
+    rank = np.linalg.matrix_rank(X.value)
+    print ("Rank of SDR solution is: ", rank)
     # return X.value
 
     ############# mapping to feasible solution 
@@ -800,21 +802,25 @@ def calculate_cost(solution, r):
         sum1 = p_elliniko * (r**z_elliniko) * pert[0][i] * Dk[i][0]
         ecomp = ecomp + sum1
     etr = 0
-    for j in range(1,m):
+    for j in range(1,m+1):
         sum2 = 0
         for i in range(n):
-            sum2 = sum2 + (ptx  * pert[0][j] * dul[i][j]) + (prx  * pert[0][j] * ddl[i][j])
+            sum2 = sum2 + (ptx  * pert[0][i+j*n] * dul[i][j]) + (prx  * pert[0][i+j*n] * ddl[i][j])
         etr = etr + sum2 
     maxtk = 0
-    for j in range(m):
+    for j in range(m+1):
         sum3 = 0
         for i in range(n):
-            sum3 = sum3 + pert[0][j]*Dk[i][j] 
+            sum3 = sum3 + pert[0][i+j*n]*Dk[i][j] 
         if(sum3 > maxtk):
             maxtk = sum3
     e_syn = ecomp + etr
     total_cost = lt * maxtk + le * e_syn  
     # print (total_cost)
+    print("this is maxtk",  maxtk)
+    print("this is etr",  etr)
+    print("this is ecomp",  ecomp)
+    print("this is pert", pert[0])
     return total_cost
 
 def main():
@@ -850,7 +856,7 @@ def main():
     #     counter +=1
     #     break;
     total_cost = calculate_cost(sdr_solution,r_opt)
-    print (total_cost)
+    print ("cost is", total_cost)
     return 
 
 if __name__ == "__main__":
