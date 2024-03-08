@@ -403,8 +403,20 @@ def initilization():
     B00 = np.block(
         final_array
     )
-    #print("edw eibai o B0", B00)
-
+    # print("edw eibai o B0", B00)
+    # print("B0 q row", B00[q])
+    # print("B0 last row", B00[q+2])
+    # print("B0 q column", B00[:,q])
+    # print("B0 last column", B00[:,q+2])
+    # print("length B0", len(B00))
+    # print("size of B0", B00.size)
+    # print("shape of B0", B00.shape)
+    # counter1 = 0
+    # for i in range(q4+1):
+    #     for j in range(q4+1):
+    #         if(B00[i][j] != 0):
+    #             counter1 = counter1 + 1
+    # print("counter is non zero elements in B0", counter1)
 
     #b2 einai o b2, g5 einai o adj tou b2
     B20 = []
@@ -423,6 +435,20 @@ def initilization():
         final_array
     )
     #print("edw einai o B2", B20)
+    # print("edw eibai o B2", B20)
+    # print("B2 q row", B20[m*n+n+2])
+    # print("B0 last row", B20[q+2])
+    # print("B0 q column", B20[:,m*n+n+2])
+    # print("B0 last column", B20[:,q+2])
+    # print("length B2", len(B20))
+    # print("size of B2", B20.size)
+    # print("shape of B2", B20.shape)
+    # counter1 = 0
+    # for i in range(q4+1):
+    #     for j in range(q4+1):
+    #         if(B20[i][j] != 0):
+    #             counter1 = counter1 + 1
+    # print("counter is non zero elements in B2", counter1)
 
     #k4 einai o adj tou b4
     B40 = []
@@ -440,6 +466,20 @@ def initilization():
         final_array
     )
     #print("edw einai o B4", B40)
+    # print("edw eibai o B4", B40)
+    # print("B4 q row", B40[q3,q3])
+    # print("B0 last row", B40[q+2])
+    # print("B0 q column", B40[:,m*n+n+2])
+    # print("B0 last column", B40[:,q+2])
+    # print("length B2", len(B40))
+    # print("size of B4", B40.size)
+    # print("shape of B4", B40.shape)
+    # counter1 = 0
+    # for i in range(q4+1):
+    #     for j in range(q4+1):
+    #         if(B40[i][j] != 0):
+    #             counter1 = counter1 + 1
+    # print("counter is non zero elements in B4", counter1)
 
     #k5 einai o adj tou b5
     B50 = []
@@ -651,7 +691,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     # prob.solve(solver="SCS")
     # prob.solve(solver="MOSEK")
     # prob.solve(solver="GUROBI",verbose=True)
-    prob.solve(solver="SCS", verbose=True)
+    prob.solve(solver="SCS")#, verbose=True)
     # Print result.
     print("The SDR optimal value is", prob.value)
     #print("A solution X is")
