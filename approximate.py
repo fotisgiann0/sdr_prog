@@ -37,8 +37,8 @@ le = 0.999
 lt = 1 - le
 L = 100
 s_elliniko = 150 
-rmin = 400#150 #(400-s_elliniko) #* (10**6) 
-rmax = 800#550 #(400+s_elliniko) #* (10**6)
+rmin = 150.00 #(400-s_elliniko) #* (10**6) 
+rmax = 550.00 #(400+s_elliniko) #* (10**6)
 m_elliniko = 10
 p_elliniko = 1.25 * (10**(-20))  #-26 kanonika
 z_elliniko = 3
@@ -52,7 +52,7 @@ for i in range(n):
 #print("this is ai", ai)
 w = np.empty((1,n), float)
 for i in range(n):
-    w[0][i] = 0.330 * ai[i]
+    w[0][i] = 330 * ai[i]
 #print("this is w", w)
 bi = np.empty((n), float)
 for i in range(n):
@@ -215,7 +215,7 @@ def initilization():
     # a2 einai o a2, g3 einai o adj tou a2
     g2 = []
     g2.append(np.zeros([1,q2 - 2]))
-    g2.append(-1)
+    g2.append(-10**(-6))
     g2.append(0)
     g3 = np.block(
         g2
@@ -304,7 +304,7 @@ def initilization():
     b51 = []
     k5 = []
     b51.append(np.zeros([1,q3]))
-    b51.append(-1)
+    b51.append(-1*(10**(-6)))
     b51.append(np.zeros([1,2]))
     k5 = np.block(
         b51
@@ -348,7 +348,7 @@ def initilization():
         b0[i+n][0] = le * pt3[i][0]
     b0[n+n*m] = 0
     b0[n+n*m + 1] = 0
-    b0[n+n*m + 2] = lt 
+    b0[n+n*m + 2] = lt * (10**(-6))
 
     #print("edw einai o b0", b0)
 
@@ -676,14 +676,15 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     constraints += [X >> 0]              # The operator >> denotes matrix inequality.
     constraints += [cp.trace(B40 @ X) == 0]
     constraints += [cp.trace(B20 @ X) <= 0]
+    constraints += [cp.trace(B50 @ X) >= rmin]
     constraints += [cp.trace(B50 @ X) <= rmax]
-    constraints += [cp.trace(B50 @ X) >= -rmin]  #infeasable problem here
+    #constraints += [cp.trace(B50 @ X) >= rmin]  #infeasable problem here
     constraints += [cp.trace(Jj_ol[i] @ X) == 1 for i in range(n)] #inaccurate, optimal otan einai comment
     constraints += [cp.trace(Hh_ol[i] @ X) <= 0 for i in range(m)]
     constraints += [cp.trace(Gp_ol[i] @ X) == 0 for i in range(p)]  #inacurate edw
     #constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1  #infeasable edw
     constraints += [ X>= 0]    
-    constraints += [ X[q4][q4] == 1] 
+    #constraints += [ X[q4][q4] == 1] 
 
     prob = cp.Problem(cp.Minimize(cp.trace(B00 @ X)),
                     constraints)
@@ -691,7 +692,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     # prob.solve(solver="SCS")
     # prob.solve(solver="MOSEK")
     # prob.solve(solver="GUROBI",verbose=True)
-    prob.solve(solver="SCS")#, verbose=True)
+    prob.solve(solver="SCS", verbose=True)
     # Print result.
     print("The SDR optimal value is", prob.value)
     #print("A solution X is")
