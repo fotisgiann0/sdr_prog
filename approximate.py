@@ -37,13 +37,13 @@ le = 0.999
 lt = 1 - le
 L = 100
 s_elliniko = 150 
-rmin = 150.00 #(400-s_elliniko) #* (10**6) 
-rmax = 550.00 #(400+s_elliniko) #* (10**6)
+rmin = 400 #* (10**6) #(400-s_elliniko) #* (10**6) 
+rmax = 800 #* (10**6) #(400+s_elliniko) #* (10**6)
 m_elliniko = 10
 p_elliniko = 1.25 * (10**(-20))  #-26 kanonika
 z_elliniko = 3
-Ck_ul = [0.5, 0.6, 0.9]#np.random.uniform(10,20,size=(m+1,))  #allages edw
-Ck_dl = [0.7, 0.5, 1]#np.random.uniform(10,20,size=(m+1,))  #kai edw
+Ck_ul = [12, 11, 10]#np.random.uniform(10,20,size=(m+1,))  #allages edw
+Ck_dl = [11, 16, 15]#np.random.uniform(10,20,size=(m+1,))  #kai edw
 # Ck_ul[0] = 100000
 # Ck_dl[0] = 100000
 ai = np.empty((n), float) #make 0.1 0.2 ...
@@ -146,7 +146,7 @@ def calc_r0(pert):
         return rmin
         #print("max_for_ru is 0, pert is ", pert)
     ru = sum1 / max_for_ru
-    rl = (lt / (2 * le * p_elliniko)) ** (1/3)
+    rl = ((lt / (2 * le * p_elliniko)) ** (1/3)) * (10**(-6))
     if ru < rmin:
         r0 = rmin
     elif (ru >= rmin) & (ru <= rmax):
@@ -304,7 +304,7 @@ def initilization():
     b51 = []
     k5 = []
     b51.append(np.zeros([1,q3]))
-    b51.append(-1*(10**(-6)))
+    b51.append(-1)#*(10**(-6)))
     b51.append(np.zeros([1,2]))
     k5 = np.block(
         b51
@@ -498,7 +498,7 @@ def initilization():
     )
     # print("B5 last row", B50[q4])
     # print("B5 last column", B50[:,q4])
-    # print("o B5", B50)
+    print("o B5", B50)
     # print("length B5", len(B50))
     # print("size of B5", B50.size)
     # print("shape of B5", B50.shape)
@@ -674,19 +674,19 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     X = cp.Variable((q4+1,q4+1), symmetric=True)
     constraints= []
     constraints += [X >> 0]              # The operator >> denotes matrix inequality.
-    constraints += [cp.trace(B40 @ X) == 0]
-    constraints += [cp.trace(B20 @ X) <= 0]
+    # constraints += [cp.trace(B40 @ X) == 0]
+    # constraints += [cp.trace(B20 @ X) <= 0]
     constraints += [cp.trace(B50 @ X) >= rmin]
-    constraints += [cp.trace(B50 @ X) <= rmax]
+    constraints += [cp.trace(B50 @ X) <= 800*(10**6)]
     #constraints += [cp.trace(B50 @ X) >= rmin]  #infeasable problem here
-    constraints += [cp.trace(Jj_ol[i] @ X) == 1 for i in range(n)] #inaccurate, optimal otan einai comment
-    constraints += [cp.trace(Hh_ol[i] @ X) <= 0 for i in range(m)]
-    constraints += [cp.trace(Gp_ol[i] @ X) == 0 for i in range(p)]  #inacurate edw
-    #constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1  #infeasable edw
+    # constraints += [cp.trace(Jj_ol[i] @ X) == 1 for i in range(n)] #inaccurate, optimal otan einai comment
+    # constraints += [cp.trace(Hh_ol[i] @ X) <= 0 for i in range(m)]
+    # constraints += [cp.trace(Gp_ol[i] @ X) == 0 for i in range(p)]  #inacurate edw
+    # #constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1  #infeasable edw
     constraints += [ X>= 0]    
-    #constraints += [ X[q4][q4] == 1] 
+    # constraints += [ X[q4][q4] == 1] 
 
-    prob = cp.Problem(cp.Minimize(cp.trace(B00 @ X)),
+    prob = cp.Problem(cp.Minimize(1/n*cp.trace(B00 @ X)),
                     constraints)
     # prob.solve(solver="MOSEK", verbose=True)
     # prob.solve(solver="SCS")
@@ -734,8 +734,9 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
         #A = np.trace(B40 @ Y)
         # if L < 0 and A == 0 and all([np.trace(Jj_ol[i] @ Y) == 1 for i in range(n)]) and all ([np.trace(Hh_ol[i] @ Y) <= 0 for i in range(m)]) and all ([np.trace(Gp_ol[i] @ Y) == 0 for i in range(p)]):
             #candidate = np.trace(B00 @ Y)
-        #print("pert here", pert)
-        candidate = calculate_cost(pert[0], calc_r0(pert)) #itan calc_r0(pert)
+        # print("pert here", pert[0])
+        # print("end pert")
+        candidate = calculate_cost(pert, calc_r0(pert)) #itan calc_r0(pert)
         if candidate < minimum_obj:
             minimum_obj= candidate
             solution = pert
@@ -762,6 +763,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     print ("optimal freq", optimal_freq)
     sdr_solution = solution[0][:-1]
     print ("solution ", sdr_solution)
+    print ("solution length is ", len(sdr_solution))
 
     # compute best L and A
     # print ("Lbest: ", Lbest)
@@ -846,19 +848,20 @@ def random_compression():
 
 #geniki synartisi kostous gia X kai tin trexw kai gia to r0 kai gia to X_0
 def calculate_cost(solution, r):
-    pert = solution.tolist()
+    pert = solution#.tolist()
     #minimum_obj = 10000000000000 
-    pert.append(1)
-    pert = np.array([pert])
+    #pert.append(1)
+    #pert = np.array([pert])
     #Y = np.transpose(pert)*pert
     #L = np.trace(B1 @ Y)
     #A = np.trace(B2 @ Y)
     #candidate = 1/n*np.trace(B0 @ Y)
     #minimum_obj= candidate
-    solution = pert 
+    #solution = pert 
     ecomp = 0
     for i in range(n):
-        sum1 = p_elliniko * (r**z_elliniko) * pert[0][i] * Dk[i][0]
+        #print(pert[0])
+        sum1 = p_elliniko * ((r*(10**6)) **z_elliniko) * pert[0][i] * Dk[i][0]
         ecomp = ecomp + sum1
     etr = 0
     for j in range(1,m+1):
@@ -871,6 +874,43 @@ def calculate_cost(solution, r):
         sum3 = 0
         for i in range(n):
             sum3 = sum3 + pert[0][i+j*n]*Dk[i][j] 
+        if(sum3 > maxtk):
+            maxtk = sum3
+    e_syn = ecomp + etr
+    total_cost = lt * maxtk + le * e_syn  
+    # print (total_cost)
+    # print("this is maxtk",  maxtk)
+    # print("this is etr",  etr)
+    # print("this is ecomp",  ecomp)
+    # print("this is pert", pert[0])
+    return total_cost
+
+def total_cost_is(solution, r):
+    pert = solution#.tolist()
+    #minimum_obj = 10000000000000 
+    #pert.append(1)
+    #pert = np.array([pert])
+    #Y = np.transpose(pert)*pert
+    #L = np.trace(B1 @ Y)
+    #A = np.trace(B2 @ Y)
+    #candidate = 1/n*np.trace(B0 @ Y)
+    #minimum_obj= candidate
+    #solution = pert 
+    ecomp = 0
+    for i in range(n):
+        sum1 = p_elliniko * (r**z_elliniko) * pert[i] * Dk[i][0]
+        ecomp = ecomp + sum1
+    etr = 0
+    for j in range(1,m+1):
+        sum2 = 0
+        for i in range(n):
+            sum2 = sum2 + (ptx  * pert[i+j*n] * dul[i][j]) + (prx  * pert[i+j*n] * ddl[i][j])
+        etr = etr + sum2 
+    maxtk = 0
+    for j in range(m+1):
+        sum3 = 0
+        for i in range(n):
+            sum3 = sum3 + pert[i+j*n]*Dk[i][j] 
         if(sum3 > maxtk):
             maxtk = sum3
     e_syn = ecomp + etr
@@ -914,8 +954,11 @@ def main():
     #     # Acurrent = Amax
     #     counter +=1
     #     break;
-    total_cost = calculate_cost(sdr_solution,r_opt)
-    print ("cost is", total_cost)
+    print("sdr solution is,", sdr_solution )
+    r_final = r_opt * (10**6)
+    print("final optimal freq is ", r_final)
+    costing = total_cost_is(sdr_solution,r_final)
+    print ("cost is", costing)
     return 
 
 if __name__ == "__main__":
