@@ -37,8 +37,8 @@ le = 0.5
 lt = 1 - le
 L = 100
 s_elliniko = 150 
-rmin = 400 #* (10**6) #(400-s_elliniko) #* (10**6) 
-rmax = 800 #* (10**6) #(400+s_elliniko) #* (10**6)
+rmin = 200 * (10**3) #(400-s_elliniko) #* (10**6) 
+rmax = 800 * (10**3) #(400+s_elliniko) #* (10**6)
 m_elliniko = 10
 p_elliniko = 1.25 * (10**(-8))  #-26 kanonika
 z_elliniko = 3
@@ -52,7 +52,7 @@ for i in range(n):
 #print("this is ai", ai)
 w = np.empty((1,n), float)
 for i in range(n):
-    w[0][i] = 330 * ai[i]
+    w[0][i] = 330 * ai[i] * (10**3)
 #print("this is w", w)
 bi = np.empty((n), float)
 for i in range(n):
@@ -304,7 +304,7 @@ def initilization():
     b51 = []
     k5 = []
     b51.append(np.zeros([1,q3]))
-    b51.append(-1)#*(10**(-6)))
+    b51.append((-1)*(10**(3)))
     b51.append(np.zeros([1,2]))
     k5 = np.block(
         b51
@@ -320,8 +320,8 @@ def initilization():
 
     for i in range(1, m+1):
         for j in range(n):
-            pt1.append(ptx * dul[j][i])
-            pt2.append(prx * ddl[j][i])
+            pt1.append((ptx * dul[j][i]) *(10**(-3)))
+            pt2.append((prx * ddl[j][i]) *(10**(-3)))
 
     #print(pt1)
     pt11 = np.empty((n*m,1), float)
@@ -338,17 +338,17 @@ def initilization():
     pt3 = np.empty((n*m,1), float)
     for i in range(n*m):
         pt3[i][0] = pt11[i][0] + pt22[i][0]
-    #print("edw einai o bo'", pt3)
+    print("edw einai o bo'", pt3)
 
     #gia ton b0
     b0 = np.empty((q+2,1), float)
     for i in range(n):
         b0[i][0] = 0
     for i in range(n*m):
-        b0[i+n][0] = le * pt3[i][0]
+        b0[i+n][0] = le * pt3[i][0] 
     b0[n+n*m] = 0
     b0[n+n*m + 1] = 0
-    b0[n+n*m + 2] = lt * (10**(-6))
+    b0[n+n*m + 2] = lt * (10**(-3))
 
     #print("edw einai o b0", b0)
 
@@ -898,7 +898,7 @@ def total_cost_is(solution, r):
     #solution = pert 
     ecomp = 0
     for i in range(n):
-        sum1 = p_elliniko * (r**z_elliniko) * pert[i] * Dk[i][0]
+        sum1 = p_elliniko* 10**(-18) * (r**z_elliniko) * pert[i] * Dk[i][0]
         ecomp = ecomp + sum1
     etr = 0
     for j in range(1,m+1):
