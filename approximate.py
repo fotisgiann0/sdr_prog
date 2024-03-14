@@ -37,7 +37,7 @@ le = 0.5
 lt = 1 - le
 L = 100
 s_elliniko = 150 
-rmin = 200 * (10**3) #(400-s_elliniko) #* (10**6) 
+rmin = 400 * (10**3) #(400-s_elliniko) #* (10**6) 
 rmax = 800 * (10**3) #(400+s_elliniko) #* (10**6)
 m_elliniko = 10
 p_elliniko = 1.25 * (10**(-8))  #-26 kanonika
@@ -676,7 +676,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
     constraints += [X >> 0]              # The operator >> denotes matrix inequality.
     constraints += [cp.trace(B40 @ X) == 0]
     constraints += [cp.trace(B20 @ X) <= 0]
-    constraints += [cp.trace(B50 @ X) >= rmin]
+    #constraints += [cp.trace(B50 @ X) >= rmin]
     constraints += [cp.trace(B50 @ X) <= rmax]
     #constraints += [cp.trace(B50 @ X) == rmin]  #infeasable problem here
     constraints += [cp.trace(Jj_ol[i] @ X) == 1 for i in range(n)] #inaccurate, optimal otan einai comment
@@ -740,7 +740,7 @@ def sdr_offloading(B00,B20,B40,B50,Gp_ol,Hh_ol,Jj_ol):
         if candidate < minimum_obj:
             minimum_obj= candidate
             solution = pert
-            optimal_freq = candidate
+            optimal_freq = calc_r0(pert)
             iteration_best = l
             # for iter in range(n):
             #     if pert[iter][0] != 0:
@@ -955,7 +955,7 @@ def main():
     #     counter +=1
     #     break;
     print("sdr solution is,", sdr_solution )
-    r_final = r_opt * (10**6)
+    r_final = r_opt * (10**3)
     print("final optimal freq is ", r_final)
     costing = total_cost_is(sdr_solution,r_final)
     print ("cost is", costing)
