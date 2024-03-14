@@ -33,27 +33,27 @@ ksiedge = 0.06706
 alpha = 1 # change from 0.1 to 500 
 ptx = 1.285
 prx = 1.181
-pcomp = 1
 le = 0.5
 lt = 1 - le
 L = 100
 s_elliniko = 150 
-rmin = 200 * (10**3) #(400-s_elliniko) #* (10**6) 
+rmin = 400 #200 * (10**3) #(400-s_elliniko) #* (10**6) 
 rmax = 800 * (10**3) #(400+s_elliniko) #* (10**6)
 m_elliniko = 10
-p_elliniko = 1.25 * (10**(-8))  #-26 kanonika
+p_elliniko = 1.25 * (10**(-6))  #-26 kanonika
 z_elliniko = 3
-Ck_ul = [0.5, 0.5, 0.5]#np.random.uniform(10,20,size=(m+1,))  #allages edw
-Ck_dl = [0.2, 0.1, 0.5]#np.random.uniform(10,20,size=(m+1,))  #kai edw
+pcomp = p_elliniko * (rmin**3)
+Ck_ul = [5, 7, 9]#np.random.uniform(10,20,size=(m+1,))  #allages edw
+Ck_dl = [5, 3, 7]#np.random.uniform(10,20,size=(m+1,))  #kai edw
 # Ck_ul[0] = 100000
 # Ck_dl[0] = 100000
 ai = np.empty((n), float) #make 0.1 0.2 ...
 for i in range(n):
-    ai[i] =  (0.1 + i*0.1) # 0.5#* (10**3) #(0.1 + i*0.1) * (10**6)
+    ai[i] =  0.5 #(0.1 + i*0.1) # 0.5#* (10**3) #(0.1 + i*0.1) * (10**6)
 #print("this is ai", ai)
 w = np.empty((1,n), float)
 for i in range(n):
-    w[0][i] = 330 * ai[i] * (10**3)
+    w[0][i] = 330 * ai[i] #* (10**3)
 #print("this is w", w)
 bi = np.empty((n), float)
 for i in range(n):
@@ -63,7 +63,7 @@ for i in range(m+1):
     r_k[i] = 0 #2 * (10**9)
 r_k[0] = 400 #400 * (10**6)
 r_k[1] = 2000#2 * (10**9)
-r_k[2] = 2000#2.2 * (10**9)
+r_k[2] = 2200#2.2 * (10**9)
 dul = np.empty((n,m+1), float)
 ddl = np.empty((n,m+1), float)
 Dk = np.empty((n,m+1), float)
@@ -79,7 +79,7 @@ for i in range(n):
         Dk[i][j] = dul[i][j] + ddl[i][j] + (w[0][i] / r_k[j])
 # print(dul)
 # print(ddl)
-# print(Dk)
+print(Dk)
 # print(w[0][2] / r_k[1])
         
 def create_up(sp):
@@ -292,8 +292,8 @@ def initilization():
 
     for i in range(1, m+1):
         for j in range(n):
-            pt1.append((ptx * dul[j][i]) *(10**(-3)))
-            pt2.append((prx * ddl[j][i]) *(10**(-3)))
+            pt1.append(ptx * dul[j][i]) #*(10**(-3)))
+            pt2.append(prx * ddl[j][i]) #*(10**(-3)))
 
     #print(pt1)
     pt11 = np.empty((n*m,1), float)
@@ -313,7 +313,7 @@ def initilization():
     print("edw einai o bo'", pt3)
 
     #gia ton b0
-    b0 = np.empty((q+2,1), float)
+    b0 = np.empty((q,1), float)
     for i in range(n):
         b0[i][0] = le *pcomp * Dk[i][0]
     for i in range(n*m):
@@ -333,6 +333,7 @@ def initilization():
         A111.append(np.zeros([1,n]))
     A111.append(-1)
     A11.append(A111)
+    A111 = []
     for i in range(m):
         A111.append(np.zeros([1,n]))
         for j in range(i):
@@ -351,7 +352,7 @@ def initilization():
     A1 = np.block(
             A11
         )
-    #print(A1)
+    print(A1)
 
     
 
@@ -361,8 +362,8 @@ def initilization():
     second_row = []
     final_array = []
     #b0t einai o adj tou b0
-    b0t = np.empty((1, q+2), float)
-    for i in range(q+2):
+    b0t = np.empty((1, q), float)
+    for i in range(q):
         b0t[0][i] = b0[i][0]
 
 
@@ -577,20 +578,15 @@ def initilization():
     return B00,Gp_ol,Hh_ol,Jj_ol
 
 def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):     
-    X = cp.Variable((q4+1,q4+1), symmetric=True)
+    X = cp.Variable((q+1,q+1), symmetric=True)
     constraints= []
     constraints += [X >> 0]              # The operator >> denotes matrix inequality.
-    # constraints += [cp.trace(B40 @ X) == 0]
-    # constraints += [cp.trace(B20 @ X) <= 0]
-    # constraints += [cp.trace(B50 @ X) >= rmin]
-    # constraints += [cp.trace(B50 @ X) <= rmax]
-    #constraints += [cp.trace(B50 @ X) == rmin]  #infeasable problem here
     constraints += [cp.trace(Jj_ol[i] @ X) == 1 for i in range(n)] #inaccurate, optimal otan einai comment
     constraints += [cp.trace(Hh_ol[i] @ X) <= 0 for i in range(m)]
     constraints += [cp.trace(Gp_ol[i] @ X) == 0 for i in range(p)]  #inacurate edw
     # #constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1  #infeasable edw
     constraints += [ X>= 0]    
-    # constraints += [ X[q4][q4] == 1] 
+    constraints += [ X[q][q] == 1] 
 
     prob = cp.Problem(cp.Minimize(cp.trace(B00 @ X)),
                     constraints)
@@ -613,8 +609,9 @@ def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):
     iteration_best = -1
     Xstar = X.value
     #print("Xstar is ", Xstar)
-    Xstar = Xstar[:-4,:-4]
-    #print(len(Xstar))
+    Xstar = Xstar[:-2,:-2]
+    print(len(Xstar))
+    print("p", p)
     minimum_obj = 10000000000000 
     solution=[]
     for l in range (iterations):
@@ -628,7 +625,7 @@ def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):
                 column_to_be_added[i][j+1] = f'{xcandidate[n+m*i+j]:.20f}'
         b = np.zeros_like(column_to_be_added)
         b[np.arange(len(column_to_be_added)), column_to_be_added.argmax(1)] = 1
-        pert = np.zeros([n*m+n+3, 1])
+        pert = np.zeros([n*m+n+1, 1])
         for i in range(n):
             for j in range(m):
                 pert[i][0] = b[i][0]
@@ -642,11 +639,11 @@ def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):
             #candidate = np.trace(B00 @ Y)
         # print("pert here", pert[0])
         # print("end pert")
-        candidate = calculate_cost(pert, calc_r0(pert)) #itan calc_r0(pert)
+        candidate = calculate_cost(pert) #itan calc_r0(pert)
         if candidate < minimum_obj:
             minimum_obj= candidate
             solution = pert
-            optimal_freq = candidate
+            #optimal_freq = candidate
             iteration_best = l
             # for iter in range(n):
             #     if pert[iter][0] != 0:
@@ -666,7 +663,7 @@ def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):
     print ("minimum objective ", minimum_obj)  
     print ("pert ", pert)
     print ("solution array", solution)   
-    print ("optimal freq", optimal_freq)
+    #print ("optimal freq", optimal_freq)
     sdr_solution = solution[0][:-1]
     print ("solution ", sdr_solution)
     print ("solution length is ", len(sdr_solution))
@@ -674,14 +671,14 @@ def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):
     # compute best L and A
     # print ("Lbest: ", Lbest)
     # print  ("Amax: ", Amax)
-    return sdr_solution, optimal_freq
+    return sdr_solution
 
 def random_compression(): 
     slist = np.random.uniform(0.1,1,size=(n,))
     return slist
 
 #geniki synartisi kostous gia X kai tin trexw kai gia to r0 kai gia to X_0
-def calculate_cost(solution, r):
+def calculate_cost(solution):
     pert = solution#.tolist()
     #minimum_obj = 10000000000000 
     #pert.append(1)
@@ -695,7 +692,7 @@ def calculate_cost(solution, r):
     ecomp = 0
     for i in range(n):
         #print(pert[0])
-        sum1 = p_elliniko * ((r*(10**6)) **z_elliniko) * pert[0][i] * Dk[i][0]
+        sum1 = pcomp * pert[0][i] * Dk[i][0]
         ecomp = ecomp + sum1
     etr = 0
     for j in range(1,m+1):
@@ -719,7 +716,7 @@ def calculate_cost(solution, r):
     # print("this is pert", pert[0])
     return total_cost
 
-def total_cost_is(solution, r):
+def total_cost_is(solution):
     pert = solution#.tolist()
     #minimum_obj = 10000000000000 
     #pert.append(1)
@@ -732,7 +729,7 @@ def total_cost_is(solution, r):
     #solution = pert 
     ecomp = 0
     for i in range(n):
-        sum1 = p_elliniko* 10**(-18) * (r**z_elliniko) * pert[i] * Dk[i][0]
+        sum1 = pcomp * pert[i] * Dk[i][0]
         ecomp = ecomp + sum1
     etr = 0
     for j in range(1,m+1):
@@ -750,9 +747,9 @@ def total_cost_is(solution, r):
     e_syn = ecomp + etr
     total_cost = lt * maxtk + le * e_syn  
     # print (total_cost)
-    # print("this is maxtk",  maxtk)
-    # print("this is etr",  etr)
-    # print("this is ecomp",  ecomp)
+    print("this is maxtk",  maxtk)
+    print("this is etr",  etr)
+    print("this is ecomp",  ecomp)
     # print("this is pert", pert[0])
     return total_cost
 
@@ -765,7 +762,7 @@ def main():
     counter = 0 
     prev_sol = sdr_solution
     B0,B1,B2,B3 = initilization()
-    sdr_solution, r_opt = sdr_offloading(B0,B1,B2,B3) 
+    sdr_solution = sdr_offloading(B0,B1,B2,B3) 
     # while (True):
     #     # print ("\n new iteration number: ", counter)
     #     prev_sol = sdr_solution
@@ -789,9 +786,10 @@ def main():
     #     counter +=1
     #     break;
     print("sdr solution is,", sdr_solution )
-    r_final = r_opt * (10**6)
-    print("final optimal freq is ", r_final)
-    costing = total_cost_is(sdr_solution,r_final)
+    print("sdr solution length,", len(sdr_solution))
+    #r_final = r_opt * (10**6)
+    #print("final optimal freq is ", r_final)
+    costing = total_cost_is(sdr_solution)
     print ("cost is", costing)
     return 
 
