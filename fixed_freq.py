@@ -24,13 +24,13 @@ s_initial = np.random.uniform(0.1,1,size=(n,))
 R = np.random.uniform(5,10,size=(n,m))
 bmax = np.random.uniform(n/4,n/3,size=(m,))
 # print (bmax)
-Lmax = 0.9 # 0.3 #seconds
-Amin = 0.7 #0.7 
-zlocal = 0.011
-ksilocal = 0.7676
-zedge = 0.02862
-ksiedge = 0.06706
-alpha = 1 # change from 0.1 to 500 
+# Lmax = 0.9 # 0.3 #seconds
+# Amin = 0.7 #0.7 
+# zlocal = 0.011
+# ksilocal = 0.7676
+# zedge = 0.02862
+# ksiedge = 0.06706
+# alpha = 1 # change from 0.1 to 500 
 ptx = 1.285
 prx = 1.181
 le = 0.5
@@ -38,11 +38,11 @@ lt = 1 - le
 L = 100
 s_elliniko = 150 
 rmin = 400 #200 * (10**3) #(400-s_elliniko) #* (10**6) 
-rmax = 800 * (10**3) #(400+s_elliniko) #* (10**6)
+rmax = 800 #* (10**3) #(400+s_elliniko) #* (10**6)
 m_elliniko = 10
-p_elliniko = 1.25 * (10**(-6))  #-26 kanonika
+p_elliniko = 1.25 * (10**(-8))  #-26 kanonika
 z_elliniko = 3
-pcomp = p_elliniko * (rmin**3)
+pcomp = 0.8 #p_elliniko * (rmin**3)
 Ck_ul = [5, 7, 9]#np.random.uniform(10,20,size=(m+1,))  #allages edw
 Ck_dl = [5, 3, 7]#np.random.uniform(10,20,size=(m+1,))  #kai edw
 # Ck_ul[0] = 100000
@@ -379,20 +379,20 @@ def initilization():
     B00 = np.block(
         final_array
     )
-#     # print("edw eibai o B0", B00)
-#     # print("B0 q row", B00[q])
-#     # print("B0 last row", B00[q+2])
-#     # print("B0 q column", B00[:,q])
-#     # print("B0 last column", B00[:,q+2])
-#     # print("length B0", len(B00))
-#     # print("size of B0", B00.size)
-#     # print("shape of B0", B00.shape)
-#     # counter1 = 0
-#     # for i in range(q4+1):
-#     #     for j in range(q4+1):
-#     #         if(B00[i][j] != 0):
-#     #             counter1 = counter1 + 1
-#     # print("counter is non zero elements in B0", counter1)
+    # print("edw eibai o B0", B00)
+    # print("B0 q row", B00[q])
+    # print("B0 last row", B00[q])
+    # # print("B0 q column", B00[:,q])
+    # print("B0 last column", B00[:,q])
+    # # print("length B0", len(B00))
+    # # print("size of B0", B00.size)
+    # print("shape of B0", B00.shape)
+    # counter1 = 0
+    # for i in range(q+1):
+    #     for j in range(q+1):
+    #         if(B00[i][j] != 0):
+    #             counter1 = counter1 + 1
+    # print("counter is non zero elements in B0", counter1)
 
 #     #b2 einai o b2, g5 einai o adj tou b2
 #     B20 = []
@@ -495,22 +495,27 @@ def initilization():
         up_adj = np.zeros([1, n*m + n + 1])
         up_adj[0][j] = 1
         first_row.append(diag_up(j))
-        first_row.append((-0.5)*create_up(j))
+        first_row.append((-1)*(0.5)*create_up(j))
         final_array.append(first_row)
-        second_row.append((-0.5)*up_adj)
+        second_row.append((-1)*(0.5)*up_adj)
         second_row.append(0)
         final_array.append(second_row)
         Gp = np.block(
             final_array
         )
         Gp_ol.append(Gp)
-    # print("this is gp 0", Gp_ol[0], Gp_ol[0][n*m+n+3], Gp_ol[0][:,n*m+n+3])
+    # print("this is gp 0", Gp_ol[0], Gp_ol[0][0],  Gp_ol[0][p+1], Gp_ol[0][:,p+1])
+    # print("gp is ", Gp_ol[0].shape)
+    # print("this is gp 1", Gp_ol[1], Gp_ol[1][1],  Gp_ol[1][p+1], Gp_ol[1][:,p+1])
+    # print("gp is ", Gp_ol[1].shape)
+    # print("this is gp 1", Gp_ol[p-1], Gp_ol[p-1][p-1],  Gp_ol[p-1][p+1], Gp_ol[p-1][:,p+1])
+    # print("gp is ", Gp_ol[p-1].shape)
     # print("this is gp 1", Gp_ol[1], Gp_ol[1][n*m+n+3], Gp_ol[1][:,n*m+n+3])
     # print("this is gp last", Gp_ol[n*m+n-1], Gp_ol[n*m+n-1][n*m+n+3], Gp_ol[n*m+n-1][:,n*m+n+3])
     # print("checking", Gp_ol[0][n*m+n+3][0] == -0.5 )
     # print("this is gp 0", Gp_ol[0], Gp_ol[0][0], Gp_ol[0][n*m + n + 3])
     Hh_ol = []
-    for j in range(m):
+    for j in range(m+1):
         Hh = []
         first_row = []
         second_row = []
@@ -533,12 +538,14 @@ def initilization():
         )
         #print("edw einai o Hh", Hh)
         Hh_ol.append(Hh)
-    # print("edw einai o Hh 1")
-    # print( Hh_ol[0]) #, Hh_ol[0])
-    # print("Hh 0 q4" ,Hh_ol[0][q4]) #, Hh_ol[0])
-    # print("Hh 0 q4" ,Hh_ol[0][:,q4]) #, Hh_ol[0])
-    # print("Hh 1 q4" ,Hh_ol[1][q4]) #, Hh_ol[0])
-    # print("Hh 1 q4" ,Hh_ol[1][:,q4]) #, Hh_ol[0])
+    # print("edw einai o Hh 2")
+    # print( Hh_ol[2]) #, Hh_ol[0])
+    # print("Hh 0 q" ,Hh_ol[0][q]) #, Hh_ol[0])
+    # print("Hh 0 q" ,Hh_ol[0][:,q]) #, Hh_ol[0])
+    # print("Hh 1 q4" ,Hh_ol[1][q]) #, Hh_ol[0])
+    # print("Hh 1 q4" ,Hh_ol[1][:,q]) #, Hh_ol[0])
+    # print("Hh 2 q4" ,Hh_ol[2][q]) #, Hh_ol[0])
+    # print("Hh 2 q4" ,Hh_ol[2][:,q]) #, Hh_ol[0])
     # print("edw einai o Hh 2")#, Hh_ol[1])
     # print(Hh_ol[1])
     # print("A1")
@@ -569,8 +576,12 @@ def initilization():
             final_array
         )
         Jj_ol.append(Jj)
-    # print("this is jj 0", Jj_ol[0][:,q4]) #, Jj_ol[1], Jj_ol[2])
-    # print("this is jj 1", Jj_ol[1][:,q4])
+    # print("this is jj 0", Jj_ol[0]) #, Jj_ol[1], Jj_ol[2])
+    # print("this is jj 0", Jj_ol[0][:,q])
+    # print("this is jj 0", Jj_ol[0][q])
+    # print("this is jj 1", Jj_ol[9])
+    # print("this is jj 1", Jj_ol[9][q])
+    # print("this is jj 1", Jj_ol[9][:,q])   
     # print("this is jj 2", Jj_ol[2][:,q4])
     # print("this is jj n-1", Jj_ol[n-1][q4]) #[ :, i]
     # print("this is jj n-1", Jj_ol[n-1][ :, q4]) #[ :, i]
@@ -582,7 +593,7 @@ def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):
     constraints= []
     constraints += [X >> 0]              # The operator >> denotes matrix inequality.
     constraints += [cp.trace(Jj_ol[i] @ X) == 1 for i in range(n)] #inaccurate, optimal otan einai comment
-    constraints += [cp.trace(Hh_ol[i] @ X) <= 0 for i in range(m)]
+    constraints += [cp.trace(Hh_ol[i] @ X) <= 0 for i in range(m+1)]
     constraints += [cp.trace(Gp_ol[i] @ X) == 0 for i in range(p)]  #inacurate edw
     # #constraints += [X<= 1, X>= 0]   # Convex Relaxation 0<=x_i,y_{ij}<=1  #infeasable edw
     constraints += [ X>= 0]    
@@ -610,8 +621,8 @@ def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):
     Xstar = X.value
     #print("Xstar is ", Xstar)
     Xstar = Xstar[:-2,:-2]
-    print(len(Xstar))
-    print("p", p)
+    # print(len(Xstar))
+    # print("p", p)
     minimum_obj = 10000000000000 
     solution=[]
     for l in range (iterations):
@@ -690,6 +701,7 @@ def calculate_cost(solution):
     #minimum_obj= candidate
     #solution = pert 
     ecomp = 0
+    sum1 = 0
     for i in range(n):
         #print(pert[0])
         sum1 = pcomp * pert[0][i] * Dk[i][0]
@@ -728,6 +740,7 @@ def total_cost_is(solution):
     #minimum_obj= candidate
     #solution = pert 
     ecomp = 0
+    sum1 = 0
     for i in range(n):
         sum1 = pcomp * pert[i] * Dk[i][0]
         ecomp = ecomp + sum1
@@ -788,7 +801,7 @@ def main():
     print("sdr solution is,", sdr_solution )
     print("sdr solution length,", len(sdr_solution))
     #r_final = r_opt * (10**6)
-    #print("final optimal freq is ", r_final)
+    print("pcomp is ", pcomp)
     costing = total_cost_is(sdr_solution)
     print ("cost is", costing)
     return 
