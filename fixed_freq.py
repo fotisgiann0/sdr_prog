@@ -504,6 +504,14 @@ def initilization():
             final_array
         )
         Gp_ol.append(Gp)
+    
+    # for k in range(p):     
+    #     counter = 0
+    #     for i in range(q+1):
+    #         for j in range(q+1):
+    #             if(Gp_ol[k][i][j] != 0):
+    #                 counter = counter + 1
+    #     print("counter is non zero elements in Gp", k, counter)
     # print("this is gp 0", Gp_ol[0], Gp_ol[0][0],  Gp_ol[0][p+1], Gp_ol[0][:,p+1])
     # print("gp is ", Gp_ol[0].shape)
     # print("this is gp 1", Gp_ol[1], Gp_ol[1][1],  Gp_ol[1][p+1], Gp_ol[1][:,p+1])
@@ -646,16 +654,23 @@ def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):
         Y = np.transpose(pert)*pert
         # L = np.trace(B20 @ Y)
         #A = np.trace(B40 @ Y)
-        # if L < 0 and A == 0 and all([np.trace(Jj_ol[i] @ Y) == 1 for i in range(n)]) and all ([np.trace(Hh_ol[i] @ Y) <= 0 for i in range(m)]) and all ([np.trace(Gp_ol[i] @ Y) == 0 for i in range(p)]):
-            #candidate = np.trace(B00 @ Y)
+        #if L < 0 and A == 0 and all([np.trace(Jj_ol[i] @ Y) == 1 for i in range(n)]) and all ([np.trace(Hh_ol[i] @ Y) <= 0 for i in range(m+1)]) and all ([np.trace(Gp_ol[i] @ Y) == 0 for i in range(p)]):
+        list1 = []
+        for i in range(n):
+            sum1 = 0
+            for j in range(m+1):
+                sum1 = sum1 + pert[0][i+j*n]
+            list1.append(sum1)
+        if (list1[i]== 1 for i in range(n)):
+        #candidate = np.trace(B00 @ Y)
         # print("pert here", pert[0])
         # print("end pert")
-        candidate = calculate_cost(pert) #itan calc_r0(pert)
-        if candidate < minimum_obj:
-            minimum_obj= candidate
-            solution = pert
-            #optimal_freq = candidate
-            iteration_best = l
+            candidate = calculate_cost(pert) #itan calc_r0(pert)
+            if candidate < minimum_obj:
+                minimum_obj= candidate
+                solution = pert
+                #optimal_freq = candidate
+                iteration_best = l
             # for iter in range(n):
             #     if pert[iter][0] != 0:
             #         ro = calc_r0(pert)
@@ -701,11 +716,8 @@ def calculate_cost(solution):
     #minimum_obj= candidate
     #solution = pert 
     ecomp = 0
-    sum1 = 0
     for i in range(n):
-        #print(pert[0])
-        sum1 = pcomp * pert[0][i] * Dk[i][0]
-        ecomp = ecomp + sum1
+        ecomp = ecomp + pcomp * pert[0][i] * Dk[i][0]
     etr = 0
     for j in range(1,m+1):
         sum2 = 0
