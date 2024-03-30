@@ -33,7 +33,7 @@ bmax = np.random.uniform(n/4,n/3,size=(m,))
 # alpha = 1 # change from 0.1 to 500 
 ptx = 1.285
 prx = 1.181
-le = 0.5
+le = 0.99
 lt = 1 - le
 L = 100
 s_elliniko = 150 
@@ -49,7 +49,7 @@ Ck_dl = [5, 3, 7]#np.random.uniform(10,20,size=(m+1,))  #kai edw
 # Ck_dl[0] = 100000
 ai = np.empty((n), float) #make 0.1 0.2 ...
 for i in range(n):
-    ai[i] =  0.5 #(0.1 + i*0.1) # 0.5#* (10**3) #(0.1 + i*0.1) * (10**6)
+    ai[i] =  (0.1 + i*0.1) # 0.5#* (10**3) #(0.1 + i*0.1) * (10**6)
 #print("this is ai", ai)
 w = np.empty((1,n), float)
 for i in range(n):
@@ -63,7 +63,7 @@ for i in range(m+1):
     r_k[i] = 0 #2 * (10**9)
 r_k[0] = 400 #400 * (10**6)
 r_k[1] = 2000#2 * (10**9)
-r_k[2] = 2200#2.2 * (10**9)
+r_k[2] = 2000#2.2 * (10**9)
 dul = np.empty((n,m+1), float)
 ddl = np.empty((n,m+1), float)
 Dk = np.empty((n,m+1), float)
@@ -759,6 +759,7 @@ def total_cost_is(solution):
     etr = 0
     for j in range(1,m+1):
         sum2 = 0
+        print("j is ", j)
         for i in range(n):
             sum2 = sum2 + (ptx  * pert[i+j*n] * dul[i][j]) + (prx  * pert[i+j*n] * ddl[i][j])
         etr = etr + sum2 
@@ -772,9 +773,10 @@ def total_cost_is(solution):
     e_syn = ecomp + etr
     total_cost = lt * maxtk + le * e_syn  
     # print (total_cost)
-    print("this is maxtk",  maxtk)
     print("this is etr",  etr)
     print("this is ecomp",  ecomp)
+    print("this is execution latency",  maxtk)
+    print("this is energy consumption",  e_syn)
     # print("this is pert", pert[0])
     return total_cost
 
