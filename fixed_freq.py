@@ -33,7 +33,7 @@ bmax = np.random.uniform(n/4,n/3,size=(m,))
 # alpha = 1 # change from 0.1 to 500 
 ptx = 1.285
 prx = 1.181
-le = 0.99
+le = 0.975
 lt = 1 - le
 L = 100
 s_elliniko = 150 
@@ -759,7 +759,7 @@ def total_cost_is(solution):
     etr = 0
     for j in range(1,m+1):
         sum2 = 0
-        print("j is ", j)
+        #print("j is ", j)
         for i in range(n):
             sum2 = sum2 + (ptx  * pert[i+j*n] * dul[i][j]) + (prx  * pert[i+j*n] * ddl[i][j])
         etr = etr + sum2 
@@ -770,12 +770,12 @@ def total_cost_is(solution):
             sum3 = sum3 + pert[i+j*n]*Dk[i][j] 
         if(sum3 > maxtk):
             maxtk = sum3
-    e_syn = ecomp + etr
-    total_cost = lt * maxtk + le * e_syn  
+    e_syn = (ecomp + etr) * 10
+    total_cost = lt * maxtk * 10 + le * e_syn  
     # print (total_cost)
     print("this is etr",  etr)
     print("this is ecomp",  ecomp)
-    print("this is execution latency",  maxtk)
+    print("this is execution latency",  maxtk* 10)
     print("this is energy consumption",  e_syn)
     # print("this is pert", pert[0])
     return total_cost
