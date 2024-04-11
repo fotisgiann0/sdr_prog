@@ -23,36 +23,29 @@ s_initial = np.random.uniform(0.1,1,size=(n,))
 # b = np.random.uniform(15,95,size=(m,))
 R = np.random.uniform(5,10,size=(n,m))
 bmax = np.random.uniform(n/4,n/3,size=(m,))
-# print (bmax)
-# Lmax = 0.9 # 0.3 #seconds
-# Amin = 0.7 #0.7 
-# zlocal = 0.011
-# ksilocal = 0.7676
-# zedge = 0.02862
-# ksiedge = 0.06706
-# alpha = 1 # change from 0.1 to 500 
+ 
 ptx = 1.285
 prx = 1.181
 le = 0.5
 lt = 1 - le
 L = 100
 s_elliniko = 150 
-rmin = 400 #200 * (10**3) #(400-s_elliniko) #* (10**6) 
-rmax = 800 #* (10**3) #(400+s_elliniko) #* (10**6)
+rmin = 400 
+rmax = 800 
 m_elliniko = 10
-p_elliniko = 1.25 * (10**(-8))  #-26 kanonika
+p_elliniko = 1.25 * (10**(-8)) 
 z_elliniko = 3
 pcomp = 0.8 #p_elliniko * (rmin**3)
-Ck_ul = [15, 17, 14, 12]#np.random.uniform(10,20,size=(m+1,))  #allages edw
-Ck_dl = [15, 13, 16, 15]#np.random.uniform(10,20,size=(m+1,))  #kai edw
-ai = np.empty((n), float) #make 0.1 0.2 ...
+Ck_ul = [15, 17, 14, 12]#np.random.uniform(10,20,size=(m+1,))  
+Ck_dl = [15, 13, 16, 15]#np.random.uniform(10,20,size=(m+1,))  
+ai = np.empty((n), float) 
 for i in range(n):
-    ai[i] =  (0.1 + i*0.1) # 0.5#* (10**3) #(0.1 + i*0.1) * (10**6)
-#print("this is ai", ai)
+    ai[i] =  (0.1 + i*0.1) # 0.5
+
 w = np.empty((1,n), float)
 for i in range(n):
-    w[0][i] = 330 * ai[i] #* (10**3)
-#print("this is w", w)
+    w[0][i] = 330 * ai[i]
+
 bi = np.empty((n), float)
 for i in range(n):
     bi[i] = 0.2 * ai[i]
@@ -74,8 +67,8 @@ for i in range(n):
             dul[i][0] = 0
             ddl[i][0] = 0
         else :
-            dul[i][j] = ai[i] / Ck_ul[j] #(Ck_ul[j] * (10**6))
-            ddl[i][j] = bi[i] / Ck_dl[j] #(Ck_dl[j] * (10**6))
+            dul[i][j] = ai[i] / Ck_ul[j]
+            ddl[i][j] = bi[i] / Ck_dl[j] 
         Dk[i][j] = dul[i][j] + ddl[i][j] + (w[0][i] / r_k[j])
 
         
@@ -175,7 +168,7 @@ def initilization():
     pt3 = np.empty((n*m,1), float)
     for i in range(n*m):
         pt3[i][0] = pt11[i][0] + pt22[i][0]
-    print("edw einai o bo'", pt3)
+    #print("edw einai o bo'", pt3)
 
     #gia ton b0
     b0 = np.empty((q,1), float)
@@ -264,7 +257,7 @@ def initilization():
             final_array
         )
         Gp_ol.append(Gp)
-    
+    # for testing:
     # for k in range(p):     
     #     counter = 0
     #     for i in range(q+1):
@@ -306,6 +299,7 @@ def initilization():
         )
         #print("edw einai o Hh", Hh)
         Hh_ol.append(Hh)
+     # for testing:
     # print("edw einai o Hh 2")
     # print( Hh_ol[2]) #, Hh_ol[0])
     # print("Hh 0 q" ,Hh_ol[0][q]) #, Hh_ol[0])
@@ -344,6 +338,7 @@ def initilization():
             final_array
         )
         Jj_ol.append(Jj)
+     # for testing:
     # print("this is jj 0", Jj_ol[0]) #, Jj_ol[1], Jj_ol[2])
     # print("this is jj 0", Jj_ol[0][:,q])
     # print("this is jj 0", Jj_ol[0][q])
@@ -466,15 +461,7 @@ def random_compression():
 #geniki synartisi kostous gia X kai tin trexw kai gia to r0 kai gia to X_0
 def calculate_cost(solution):
     pert = solution#.tolist()
-    #minimum_obj = 10000000000000 
-    #pert.append(1)
-    #pert = np.array([pert])
-    #Y = np.transpose(pert)*pert
-    #L = np.trace(B1 @ Y)
-    #A = np.trace(B2 @ Y)
-    #candidate = 1/n*np.trace(B0 @ Y)
-    #minimum_obj= candidate
-    #solution = pert 
+
     ecomp = 0
     for i in range(n):
         ecomp = ecomp + pcomp * pert[0][i] * Dk[i][0]
@@ -493,11 +480,7 @@ def calculate_cost(solution):
             maxtk = sum3
     e_syn = ecomp + etr
     total_cost = lt * maxtk + le * e_syn  
-    # print (total_cost)
-    # print("this is maxtk",  maxtk)
-    # print("this is etr",  etr)
-    # print("this is ecomp",  ecomp)
-    # print("this is pert", pert[0])
+
     return total_cost
 
 def total_cost_is(solution):
@@ -528,7 +511,7 @@ def total_cost_is(solution):
     print("this is ecomp",  ecomp)
     print("this is execution latency",  maxtk* 10)
     print("this is energy consumption",  e_syn)
-    # print("this is pert", pert[0])
+
     return total_cost
 
 def main():
