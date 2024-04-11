@@ -7,14 +7,14 @@ import sys
 from math import exp, log
 np.set_printoptions(threshold=sys.maxsize)
 ###################### basic settings
-m = 4
-n = 10  #kanonika 10
+m = 3
+n = 10 
 p = n*m + n 
 q = m*n + n + 1
 q2 = m*n + n + 2
 q3 = m*n + n
 q4 = m*n + n + 3
-iterations = 150
+iterations = 100
 np.random.seed(5)
 
 ###################### constants
@@ -33,7 +33,7 @@ bmax = np.random.uniform(n/4,n/3,size=(m,))
 # alpha = 1 # change from 0.1 to 500 
 ptx = 1.285
 prx = 1.181
-le = 0.99
+le = 0.5
 lt = 1 - le
 L = 100
 s_elliniko = 150 
@@ -43,10 +43,8 @@ m_elliniko = 10
 p_elliniko = 1.25 * (10**(-8))  #-26 kanonika
 z_elliniko = 3
 pcomp = 0.8 #p_elliniko * (rmin**3)
-Ck_ul = [5, 7, 9, 8, 6]#np.random.uniform(10,20,size=(m+1,))  #allages edw
-Ck_dl = [5, 3, 7, 4, 9]#np.random.uniform(10,20,size=(m+1,))  #kai edw
-# Ck_ul[0] = 100000
-# Ck_dl[0] = 100000
+Ck_ul = [15, 17, 14, 12]#np.random.uniform(10,20,size=(m+1,))  #allages edw
+Ck_dl = [15, 13, 16, 15]#np.random.uniform(10,20,size=(m+1,))  #kai edw
 ai = np.empty((n), float) #make 0.1 0.2 ...
 for i in range(n):
     ai[i] =  (0.1 + i*0.1) # 0.5#* (10**3) #(0.1 + i*0.1) * (10**6)
@@ -65,11 +63,11 @@ r_k[0] = 400 #400 * (10**6)
 r_k[1] = 2000#2 * (10**9)
 r_k[2] = 2000#2.2 * (10**9)
 r_k[3] = 2000#2.2 * (10**9)
-r_k[4] = 2000#2.2 * (10**9)
+#r_k[4] = 2000#2.2 * (10**9)
 dul = np.empty((n,m+1), float)
 ddl = np.empty((n,m+1), float)
 Dk = np.empty((n,m+1), float)
-#ZEROING THE M = 0 stuff, change ckul ckdl(den xreiazetai aparaitita)
+
 for i in range(n):
     for j in range(m+1):
         if(j == 0):
@@ -79,10 +77,7 @@ for i in range(n):
             dul[i][j] = ai[i] / Ck_ul[j] #(Ck_ul[j] * (10**6))
             ddl[i][j] = bi[i] / Ck_dl[j] #(Ck_dl[j] * (10**6))
         Dk[i][j] = dul[i][j] + ddl[i][j] + (w[0][i] / r_k[j])
-# print(dul)
-# print(ddl)
-print(Dk)
-# print(w[0][2] / r_k[1])
+
         
 def create_up(sp):
     up = np.zeros([n*m + n + 1, 1])
@@ -147,87 +142,7 @@ def minim_r0(pert, r3, r4):
         return r4
  
 def initilization():
-#     C1 = np.zeros([q,q])
-#     a1 = np.zeros([q,1])
-#     a3 = np.zeros([1,q])
-#     a4 = np.zeros([2,1])
-#     a5 = np.zeros([1,2])
-#     #a6 = np.zeros([2,2])
-#     aq2 = np.zeros([q2,q2])
-#     #print("this is ckul" ,Ck_ul)
-#     g0 = []
-#     g0.append(w)
-#     g0.append(np.zeros([1,q - n]))
-#     g1 = np.block(
-#         g0
-#     )
-#     #print(g1)
-#     a0 = np.empty((q,1), float)
-#     for i in range(q):
-#         a0[i][0] = g1[0][i]
-#     #print("this is a0", a0)
-#     A0=[]
-#     row1 =[]
-#     row2 = []
-#     row3 = []
-#     fini = []
-#     row1.append(C1)
-#     row1.append(a0)
-#     row1.append(a1)
-#     fini.append(row1)
-#     row2.append(g1)
-#     row2.append(a5)
-#     fini.append(row2)
-#     row3.append(a3)
-#     row3.append(a5)
-#     fini.append(row3)
 
-#     A0 = np.block(
-#         fini
-#     )
-#     #print("this is A0" , A0) #looks good
-#     # a2 einai o a2, g3 einai o adj tou a2
-#     g2 = []
-#     g2.append(np.zeros([1,q2 - 2]))
-#     g2.append(-10**(-6))
-#     g2.append(0)
-#     g3 = np.block(
-#         g2
-#     )
-
-#     a2 = np.empty((q2,1), float)
-#     for i in range(q2):
-#         a2[i][0] = g3[0][i]
-#     #print(a2)
-#     #print("this is a2", a2)
-#     #b2 einai o b2, g5 einai o adj tou b2
-#     g4 =[]
-#     g4.append(w)
-#     g4.append(np.zeros([1,q2 - n + 1]))
-#     g5 = np.block(
-#         g4
-#     )
-#     b2 = np.empty((q2+1,1), float)
-#     for i in range(q2+1):
-#         b2[i][0] = g5[0][i]
-#     #print("this is b2", b2 ) looks good
-
-#     A2 = []
-#     a21 =[]
-#     r1 =[]
-#     r2 = []
-#     r1.append(aq2)
-#     r1.append(0.5 * a2)
-#     a21.append(r1)
-#     r2.append(0.5 * g3)
-#     r2.append(0)
-#     a21.append(r2)
-#     A2 = np.block(
-#         a21
-#     )
-#     #print("this is A2", A2) looks good
-
-    #A3 is the A2 matrix
     a31 = []
     for i in range(m + 1):
         a31.append(np.identity(n))
@@ -235,67 +150,15 @@ def initilization():
     A2 = np.block(
         a31
     )
-    #print( A3) looks good
-
-#     ro1 = []
-#     ro2 = []
-#     ro3 = []
-#     a41 = []
-#     A4 =[]
-#     ro1.append(np.zeros([q3,q3]))
-#     ro1.append(np.zeros([q3,1]))
-#     ro1.append(np.zeros([q3,2]))
-#     a41.append(ro1)
-#     ro2.append(np.zeros([1,q3]))
-#     ro2.append(1)
-#     ro2.append(np.zeros([1,2]))
-#     a41.append(ro2)
-#     ro3.append(np.zeros([2,q3]))
-#     ro3.append(np.zeros([2,1]))
-#     ro3.append(np.zeros([2,2]))
-#     a41.append(ro3)
-#     A4 = np.block(
-#         a41
-#     )
-#     #print(A4) looks good
-
-#     #k4 einai o adj tou b4
-#     b41 = []
-#     k4 = []
-#     b41.append(np.zeros([1,q]))
-#     b41.append(-1)
-#     b41.append(0)
-#     k4 = np.block(
-#         b41
-#     )
-#     b4 = np.empty((q+2,1), float)
-#     for i in range(q+2):
-#         b4[i][0] = k4[0][i]
-#     #print(len(b4)) looks good
 
 
-
-#     b51 = []
-#     k5 = []
-#     b51.append(np.zeros([1,q3]))
-#     b51.append((-1)*(10**(3)))
-#     b51.append(np.zeros([1,2]))
-#     k5 = np.block(
-#         b51
-#     )
-#     b5 = np.empty((q3+3,1), float)
-#     for i in range(q3+3):
-#         b5[i][0] = k5[0][i]
-#     #print(b5) looks good
-#     #EDW EIXA MEINEI STO TESTING
-    #edw 3ekinaei to ktisimo tou b0',o opios  einai o pt3
     pt1 = []
     pt2 = []
 
     for i in range(1, m+1):
         for j in range(n):
-            pt1.append(ptx * dul[j][i]) #*(10**(-3)))
-            pt2.append(prx * ddl[j][i]) #*(10**(-3)))
+            pt1.append(ptx * dul[j][i]) 
+            pt2.append(prx * ddl[j][i]) 
 
     #print(pt1)
     pt11 = np.empty((n*m,1), float)
@@ -321,8 +184,7 @@ def initilization():
     for i in range(n*m):
         b0[i+n][0] = le * pt3[i][0] 
     b0[n+n*m] = lt 
-    # b0[n+n*m + 1] = 0
-    # b0[n+n*m + 2] = lt * (10**(-3))
+
 
 #     #print("edw einai o b0", b0)
 
@@ -381,111 +243,7 @@ def initilization():
     B00 = np.block(
         final_array
     )
-    # print("edw eibai o B0", B00)
-    # print("B0 q row", B00[q])
-    # print("B0 last row", B00[q])
-    # # print("B0 q column", B00[:,q])
-    # print("B0 last column", B00[:,q])
-    # # print("length B0", len(B00))
-    # # print("size of B0", B00.size)
-    # print("shape of B0", B00.shape)
-    # counter1 = 0
-    # for i in range(q+1):
-    #     for j in range(q+1):
-    #         if(B00[i][j] != 0):
-    #             counter1 = counter1 + 1
-    # print("counter is non zero elements in B0", counter1)
-
-#     #b2 einai o b2, g5 einai o adj tou b2
-#     B20 = []
-#     first_row = []
-#     second_row = []
-#     final_array = []
-#     #print("first, sec,...", first_row, second_row, final_array)
-
-#     first_row.append(A2)
-#     first_row.append(0.5*b2)
-#     final_array.append(first_row)
-#     second_row.append(0.5*g5)
-#     second_row.append(0)
-#     final_array.append(second_row)
-#     B20 = np.block(
-#         final_array
-#     )
-#     #print("edw einai o B2", B20)
-#     # print("edw eibai o B2", B20)
-#     # print("B2 q row", B20[m*n+n+2])
-#     # print("B0 last row", B20[q+2])
-#     # print("B0 q column", B20[:,m*n+n+2])
-#     # print("B0 last column", B20[:,q+2])
-#     # print("length B2", len(B20))
-#     # print("size of B2", B20.size)
-#     # print("shape of B2", B20.shape)
-#     # counter1 = 0
-#     # for i in range(q4+1):
-#     #     for j in range(q4+1):
-#     #         if(B20[i][j] != 0):
-#     #             counter1 = counter1 + 1
-#     # print("counter is non zero elements in B2", counter1)
-
-#     #k4 einai o adj tou b4
-#     B40 = []
-#     first_row = []
-#     second_row = []
-#     final_array = []
-
-#     first_row.append(A4)
-#     first_row.append(0.5*b4)
-#     final_array.append(first_row)
-#     second_row.append(0.5*k4)
-#     second_row.append(0)
-#     final_array.append(second_row)
-#     B40 = np.block(
-#         final_array
-#     )
-#     #print("edw einai o B4", B40)
-#     # print("edw eibai o B4", B40)
-#     # print("B4 q row", B40[q3,q3])
-#     # print("B0 last row", B40[q+2])
-#     # print("B0 q column", B40[:,m*n+n+2])
-#     # print("B0 last column", B40[:,q+2])
-#     # print("length B2", len(B40))
-#     # print("size of B4", B40.size)
-#     # print("shape of B4", B40.shape)
-#     # counter1 = 0
-#     # for i in range(q4+1):
-#     #     for j in range(q4+1):
-#     #         if(B40[i][j] != 0):
-#     #             counter1 = counter1 + 1
-#     # print("counter is non zero elements in B4", counter1)
-
-#     #k5 einai o adj tou b5
-#     B50 = []
-#     first_row = []
-#     second_row = []
-#     final_array = []
-
-#     first_row.append(np.zeros([q4,q4]))
-#     first_row.append(0.5*b5)
-#     final_array.append(first_row)
-#     second_row.append(0.5*k5)
-#     second_row.append(0)
-#     final_array.append(second_row)
-#     B50 = np.block(
-#         final_array
-#     )
-#     # print("B5 last row", B50[q4])
-#     # print("B5 last column", B50[:,q4])
-#     print("o B5", B50)
-#     # print("length B5", len(B50))
-#     # print("size of B5", B50.size)
-#     # print("shape of B5", B50.shape)
-#     # counter = 0
-#     # for i in range(q4+1):
-#     #     for j in range(q4+1):
-#     #         if(B50[i][j] != 0):
-#     #             counter = counter + 1
-#     # print("counter is non zero elements in B5", counter)
+ 
     #Gp 
     Gp_ol = []
     for j in range(p):
@@ -744,15 +502,6 @@ def calculate_cost(solution):
 
 def total_cost_is(solution):
     pert = solution#.tolist()
-    #minimum_obj = 10000000000000 
-    #pert.append(1)
-    #pert = np.array([pert])
-    #Y = np.transpose(pert)*pert
-    #L = np.trace(B1 @ Y)
-    #A = np.trace(B2 @ Y)
-    #candidate = 1/n*np.trace(B0 @ Y)
-    #minimum_obj= candidate
-    #solution = pert 
     ecomp = 0
     sum1 = 0
     for i in range(n):
