@@ -7,7 +7,7 @@ import sys
 from math import exp, log
 np.set_printoptions(threshold=sys.maxsize)
 ###################### basic settings
-m = 3
+m = 2
 n = 10 
 p = n*m + n 
 q = m*n + n + 1
@@ -26,7 +26,7 @@ bmax = np.random.uniform(n/4,n/3,size=(m,))
  
 ptx = 1.285
 prx = 1.181
-le = 0.5
+le = 0.99
 lt = 1 - le
 L = 100
 s_elliniko = 150 
@@ -36,8 +36,8 @@ m_elliniko = 10
 p_elliniko = 1.25 * (10**(-8)) 
 z_elliniko = 3
 pcomp = 0.8 #p_elliniko * (rmin**3)
-Ck_ul = [15, 17, 14, 12]#np.random.uniform(10,20,size=(m+1,))  
-Ck_dl = [15, 13, 16, 15]#np.random.uniform(10,20,size=(m+1,))  
+Ck_ul = [15, 17, 14]#, 12]#np.random.uniform(10,20,size=(m+1,))  
+Ck_dl = [15, 13, 16]#, 15]#np.random.uniform(10,20,size=(m+1,))  
 ai = np.empty((n), float) 
 for i in range(n):
     ai[i] =  (0.1 + i*0.1) # 0.5
@@ -55,7 +55,7 @@ for i in range(m+1):
 r_k[0] = 400 #400 * (10**6)
 r_k[1] = 2000#2 * (10**9)
 r_k[2] = 2000#2.2 * (10**9)
-r_k[3] = 2000#2.2 * (10**9)
+#r_k[3] = 2000#2.2 * (10**9)
 #r_k[4] = 2000#2.2 * (10**9)
 dul = np.empty((n,m+1), float)
 ddl = np.empty((n,m+1), float)
@@ -514,6 +514,14 @@ def total_cost_is(solution):
 
     return total_cost
 
+def offloading_portion(solution):
+    counter = 0
+    for i in range(n):
+        if solution[i] == 1:
+            counter = counter + 1
+    portion = (n - counter) / n
+    return portion
+
 def main():
     sdr_solution = [0]
     slist = random_compression()
@@ -550,6 +558,7 @@ def main():
     print("sdr solution length,", len(sdr_solution))
     #r_final = r_opt * (10**6)
     print("pcomp is ", pcomp)
+    print("offloading portion:", offloading_portion(sdr_solution))
     costing = total_cost_is(sdr_solution)
     print ("cost is", costing)
     return 
