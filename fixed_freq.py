@@ -26,7 +26,7 @@ bmax = np.random.uniform(n/4,n/3,size=(m,))
  
 ptx = 1.285
 prx = 1.181
-le = 0.99
+le = 0.5
 lt = 1 - le
 L = 100
 s_elliniko = 150 
@@ -209,7 +209,7 @@ def initilization():
     A1 = np.block(
             A11
         )
-    print(A1)
+    #print(A1)
 
     
 
@@ -368,7 +368,7 @@ def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):
     # prob.solve(solver="SCS")
     # prob.solve(solver="MOSEK")
     # prob.solve(solver="GUROBI",verbose=True)
-    prob.solve(solver="SCS", verbose=True)
+    prob.solve(solver="SCS")#, verbose=True)
     # Print result.
     print("The SDR optimal value is", prob.value)
     #print("A solution X is")
@@ -389,7 +389,7 @@ def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):
     minimum_obj = 10000000000000 
     solution=[]
     for l in range (iterations):
-        ksi = np.random.multivariate_normal(np.zeros(p), Xstar,   tol=1e-6) #isws add size =100 arguement
+        ksi = np.random.multivariate_normal(np.zeros(p), Xstar,   tol=1e-6) 
         # print (ksi)
         xcandidate = 1/ (1 + np.exp(-m_elliniko*ksi))   # mapping function
         column_to_be_added = np.zeros([n,m+1])
@@ -442,12 +442,12 @@ def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):
 
     print ("iteration number to find optimal SDR solution: ", iteration_best)
     print ("minimum objective ", minimum_obj)  
-    print ("pert ", pert)
-    print ("solution array", solution)   
+    # print ("pert ", pert)
+    # print ("solution array", solution)   
     #print ("optimal freq", optimal_freq)
     sdr_solution = solution[0][:-1]
-    print ("solution ", sdr_solution)
-    print ("solution length is ", len(sdr_solution))
+    # print ("solution ", sdr_solution)
+    # print ("solution length is ", len(sdr_solution))
 
     # compute best L and A
     # print ("Lbest: ", Lbest)
@@ -457,6 +457,33 @@ def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):
 def random_compression(): 
     slist = np.random.uniform(0.1,1,size=(n,))
     return slist
+
+def random_offloading():
+    solution = np.zeros( [1, n*(m+1)])
+    for i in range(n):
+        rand_idx = random.randint(0, m)
+       # print(rand_idx)
+        for j in range(m+1):
+            if(j==rand_idx):
+                solution[0][j*n+i] = 1
+            else:
+                solution[0][j*n+i] = 0
+    #testing it
+    # list1 = []
+    # for i in range(n):
+    #     sum1 = 0
+    #     for j in range(m+1):
+    #         sum1 = sum1 + solution[0][i+j*n]
+    #     list1.append(sum1)
+    # if (list1[i]== 1 for i in range(n)):
+    #     print("true")
+    return solution[0]
+
+def local_processing():
+    solution = np.zeros( [1, n*(m+1)])
+    for i in range(n):
+        solution[0][i] = 1
+    return solution[0]
 
 #geniki synartisi kostous gia X kai tin trexw kai gia to r0 kai gia to X_0
 def calculate_cost(solution):
@@ -507,10 +534,10 @@ def total_cost_is(solution):
     e_syn = (ecomp + etr) * 10
     total_cost = lt * maxtk * 10 + le * e_syn  
     # print (total_cost)
-    print("this is etr",  etr)
-    print("this is ecomp",  ecomp)
-    print("this is execution latency",  maxtk* 10)
-    print("this is energy consumption",  e_syn)
+    # print("this is etr",  etr)
+    # print("this is ecomp",  ecomp)
+    # print("this is execution latency",  maxtk* 10)
+    # print("this is energy consumption",  e_syn)
 
     return total_cost
 
@@ -524,7 +551,8 @@ def offloading_portion(solution):
 
 def main():
     sdr_solution = [0]
-    slist = random_compression()
+    slist = random_offloading()
+    local_list = local_processing()
     Lcurrent = 1000000
     Acurrent = -10000000
     epsilon = 0.01
@@ -554,13 +582,17 @@ def main():
     #     # Acurrent = Amax
     #     counter +=1
     #     break;
-    print("sdr solution is,", sdr_solution )
-    print("sdr solution length,", len(sdr_solution))
+    print("sdr solution is:", sdr_solution )
+    #print("sdr solution length:", len(sdr_solution))
     #r_final = r_opt * (10**6)
-    print("pcomp is ", pcomp)
+    print("pcomp is", pcomp)
     print("offloading portion:", offloading_portion(sdr_solution))
     costing = total_cost_is(sdr_solution)
     print ("cost is", costing)
+    #print("random compression", slist)
+    print("random assign cost:", total_cost_is(slist))
+    #print("local processing", local_list)
+    print("local processing cost:", total_cost_is(local_list))
     return 
 
 if __name__ == "__main__":
