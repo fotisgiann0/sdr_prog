@@ -20,7 +20,6 @@ np.random.seed(5)
 ###################### constants
 d = np.random.uniform(1,2,size=(n,))
 s_initial = np.random.uniform(0.1,1,size=(n,))
-# b = np.random.uniform(15,95,size=(m,))
 R = np.random.uniform(5,10,size=(n,m))
 bmax = np.random.uniform(n/4,n/3,size=(m,))
  
@@ -409,7 +408,6 @@ def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):
         Y = np.transpose(pert)*pert
         # L = np.trace(B20 @ Y)
         #A = np.trace(B40 @ Y)
-        #if L < 0 and A == 0 and all([np.trace(Jj_ol[i] @ Y) == 1 for i in range(n)]) and all ([np.trace(Hh_ol[i] @ Y) <= 0 for i in range(m+1)]) and all ([np.trace(Gp_ol[i] @ Y) == 0 for i in range(p)]):
         list1 = []
         for i in range(n):
             sum1 = 0
@@ -426,19 +424,7 @@ def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):
                 solution = pert
                 #optimal_freq = candidate
                 iteration_best = l
-            # for iter in range(n):
-            #     if pert[iter][0] != 0:
-            #         ro = calc_r0(pert)
-            #     else:
-            #         ro = (rmin + rmax) / 2
-            #Lbest = L/n
-            #Amax= -A/n
-    # else: 
-        #     candidate = 1/n*np.trace(B0 @ Y)
-        #     if candidate< minimum_obj:
-        #         print ("ring the bell")
-        #         print ("solution ", candidate)
-        #         print ("solution ", pert)
+
 
     print ("iteration number to find optimal SDR solution: ", iteration_best)
     print ("minimum objective ", minimum_obj)  
@@ -449,9 +435,7 @@ def sdr_offloading(B00,Gp_ol,Hh_ol,Jj_ol):
     # print ("solution ", sdr_solution)
     # print ("solution length is ", len(sdr_solution))
 
-    # compute best L and A
-    # print ("Lbest: ", Lbest)
-    # print  ("Amax: ", Amax)
+
     return sdr_solution
 
 def random_compression(): 
@@ -485,7 +469,7 @@ def local_processing():
         solution[0][i] = 1
     return solution[0]
 
-#geniki synartisi kostous gia X kai tin trexw kai gia to r0 kai gia to X_0
+
 def calculate_cost(solution):
     pert = solution#.tolist()
 
@@ -511,7 +495,7 @@ def calculate_cost(solution):
     return total_cost
 
 def total_cost_is(solution):
-    pert = solution#.tolist()
+    pert = solution
     ecomp = 0
     sum1 = 0
     for i in range(n):
@@ -551,37 +535,15 @@ def offloading_portion(solution):
 
 def main():
     sdr_solution = [0]
-    slist = random_offloading()
     local_list = local_processing()
-    Lcurrent = 1000000
-    Acurrent = -10000000
-    epsilon = 0.01
-    counter = 0 
-    prev_sol = sdr_solution
     B0,B1,B2,B3 = initilization()
     sdr_solution = sdr_offloading(B0,B1,B2,B3) 
-    # while (True):
-    #     # print ("\n new iteration number: ", counter)
-    #     prev_sol = sdr_solution
-    #     B0,B1,B2,B3,B4,B5,B6 = initilization(slist)
-    #     sdr_solution, Lbest, Amax = sdr_offloading(B0,B1,B2,B3,B4,B5,B6) 
-    #     # print (sdr_solution)
-    #     # sdr_solution = random_offloading(B0,B1,B2,B3,B4)
-    #     # sdr_solution, Lbest, Amax  = implement_brute_force(B0,B1,B2,B3,B4,B5)
-    #     # slist = random_compression()
-    #     # print ("Total Cost of Solution: ", calculate_cost(sdr_solution,B0,B1,B2,B3,B4))
-    #     slist = scaling_problem(sdr_solution)
-    #     # if not((sdr_solution == prev_sol).all()) and counter != 0 :
-    #     #     print("different solution found:")
-    #     #     print ("new solution:" , sdr_solution)
-    #     # #     print ("previous solution:" ,prev_sol)
-    #     # if (Lbest-alpha*Amax <= Lcurrent-alpha*Acurrent + epsilon) and (Lbest-alpha*Amax >= Lcurrent-alpha*Acurrent - epsilon):
-    #     #     # print ("condition2")
-    #     #     break; 
-    #     # Lcurrent = Lbest
-    #     # Acurrent = Amax
-    #     counter +=1
-    #     break;
+
+    sum_rand = 0
+    for i in range(100):
+        rand_list = random_offloading()
+        sum_rand += total_cost_is(rand_list)
+    rand_cost = sum_rand / 100
     print("sdr solution is:", sdr_solution )
     #print("sdr solution length:", len(sdr_solution))
     #r_final = r_opt * (10**6)
@@ -589,9 +551,7 @@ def main():
     print("offloading portion:", offloading_portion(sdr_solution))
     costing = total_cost_is(sdr_solution)
     print ("cost is", costing)
-    #print("random compression", slist)
-    print("random assign cost:", total_cost_is(slist))
-    #print("local processing", local_list)
+    print("random assign cost:", rand_cost)
     print("local processing cost:", total_cost_is(local_list))
     return 
 
