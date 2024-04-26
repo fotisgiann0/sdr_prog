@@ -8,7 +8,7 @@ from math import exp, log
 np.set_printoptions(threshold=sys.maxsize)
 ###################### basic settings
 m = 2
-n = 10 
+n = 12
 p = n*m + n 
 q = m*n + n + 1
 q2 = m*n + n + 2
@@ -35,11 +35,11 @@ m_elliniko = 10
 p_elliniko = 1.25 * (10**(-8)) 
 z_elliniko = 3
 pcomp = 0.8 #p_elliniko * (rmin**3)
-Ck_ul = [15, 17, 14]#, 12]#np.random.uniform(10,20,size=(m+1,))  
-Ck_dl = [15, 13, 16]#, 15]#np.random.uniform(10,20,size=(m+1,))  
+Ck_ul = [25, 35, 30]#, 12]#np.random.uniform(10,20,size=(m+1,))  
+Ck_dl = [40, 43, 27]#, 15]#np.random.uniform(10,20,size=(m+1,))  
 ai = np.empty((n), float) 
 for i in range(n):
-    ai[i] =  (0.1 + i*0.1) # 0.5
+    ai[i] =  0.5 #(0.1 + i*0.1) # 0.5
 
 w = np.empty((1,n), float)
 for i in range(n):
@@ -53,7 +53,7 @@ for i in range(m+1):
     r_k[i] = 0 #2 * (10**9)
 r_k[0] = 400 #400 * (10**6)
 r_k[1] = 2000#2 * (10**9)
-r_k[2] = 2000#2.2 * (10**9)
+r_k[2] = 2200#2.2 * (10**9)
 #r_k[3] = 2000#2.2 * (10**9)
 #r_k[4] = 2000#2.2 * (10**9)
 dul = np.empty((n,m+1), float)
